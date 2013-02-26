@@ -1,0 +1,16 @@
+﻿@{  
+    ViewBag.Title = "Home Page";
+}
+<div class="hero-unit">
+    <h4>@ViewBag.Message</h4>
+
+</div>             
+<div class="well"> 
+    <ul class="unstyled">
+    </ul>
+    @using (Html.BeginForm("Room", "Home", FormMethod.Post))
+    {
+        <input type="submit" id="btn_room_create" class="btn-success" value="Create a new room"/>
+        <input type="hidden" id="isNew" value="1"/>
+    }
+</div>
