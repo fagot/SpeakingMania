@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="SpeakingMania"  namespace="SpeakingMania.DataLayer.Models">
+  <class name="User" table="Users">
+    <id name="Id" unsaved-value="0">
+      <column name="Id" not-null="true" />
+      <generator class="identity"/>
+    </id>
+    <property name="UserIdentity" />
+    <property name="UserName" />
+    <many-to-one name="Room" column ="RoomId"/>
+   
+  </class>
+</hibernate-mapping>

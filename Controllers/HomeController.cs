@@ -1,4 +1,8 @@
 ﻿using System.Web.Mvc;
+using SpeakingMania.DataLayer.Repository;
+using SpeakingMania.DataLayer.Models;
+using System;
+using SpeakingMania.Models;
 
 namespace SpeakingMania.Controllers
 {
@@ -18,7 +22,17 @@ namespace SpeakingMania.Controllers
         [HttpPost]
         public ActionResult Room()
         {
+            string roomName = "TESt";
+            var hub = new UserHub();
+            var room = new Room { RoomIdentity = roomName, RoomName = roomName };
+            RoomRepository.Instance.Add(room);
+            hub.UpdateUsers(roomName);
             return View("Room");
+        }
+
+        public ActionResult Login()
+        {
+            return View("Index");
         }
     }
 }

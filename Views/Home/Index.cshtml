@@ -4,7 +4,8 @@
 <div class="hero-unit">
     <h4>@ViewBag.Message</h4>
 
-</div>             
+</div>
+          
 <div class="well"> 
     <ul class="unstyled">
     </ul>
@@ -14,3 +15,34 @@
         <input type="hidden" id="isNew" value="1"/>
     }
 </div>
+
+<div class="modal fade" id="login_modal">
+    <div class="modal-header">
+        <h3>Please fill the form</h3>
+    </div>
+    <div id="modal_content" class="modal-body">
+        @using (Ajax.BeginForm("Login", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "Start" }, new { Class = "form-search" }))
+        {
+            <input id="login" name="login" class="input-xlarge" type="text" placeholder="Ваше имя" />
+            <span id="login-error" class="help-inline error" style="display: none;"></span>
+            <button class="btn btn-success" type="submit">Войти в чат</button>
+        }
+    </div>
+    <div class="modal-footer">
+    </div>
+</div>   
+    <script type="text/javascript">
+        function SetName() {
+            $("#login_modal").modal();
+            $("#login").focus();
+        }
+        
+    </script>
+    @if (ViewBag.Login != null && !String.IsNullOrEmpty(ViewBag.Login.ToString()))
+    {
+        <script type="text/javascript">Start({ success: true, name: '@ViewBag.Login' });</script>
+    }
+    else
+    {
+        <script type="text/javascript"> SetName();</script>
+    }
