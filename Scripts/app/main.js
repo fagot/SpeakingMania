@@ -1,4 +1,4 @@
-﻿var CHAT = {};
+﻿var HUB = {};
 var OPTIONS = {};
 
 function Login(data) {
@@ -10,12 +10,10 @@ function Login(data) {
         // Ключ комнаты чата
         OPTIONS.RoomKey = 'MAIN';
         // Прокси-объект чата
-        CHAT = $.connection.chat;
+        HUB = $.connection.userHub;
+        HUB.OnJoinRoom = OnJoinRoom;
+        HUB.OnUpdateUsers = OnUpdateUsers;
 
-        //// Обработчик получения сообщения
-        //CHAT.OnSend = OnSend;
-        //// Обработчик присоединения к комнате
-        //CHAT.OnJoinRoom = OnJoinRoom;
 
     } else {
         $("#login").addClass("error");
@@ -33,7 +31,7 @@ function Login(data) {
     //});
 
     $.connection.hub.start(function () {
-        CHAT.joinRoom(OPTIONS.RoomKey, OPTIONS.MyName);
+        HUB.server.joinRoom(OPTIONS.RoomKey, OPTIONS.MyName);
     });
 }
 
@@ -41,7 +39,19 @@ function SetName() {
     $("#login_modal").modal();
     $("#login").focus();
 }
+function OnJoinRoom(key) {
+    OPTIONS.MyKey = key;
+}
 
+function OnUpdateUsers(data) {
+    var usersList = $("#users ul"),
+            newList = "";
+    for (var i = 0; i < data.length; i++) {
+        var user = data[i];
+        newList += '<li data-key="' + user.Key + '"><i class="icon-user"></i>' + user.Name + '</li>';
+    }
+    usersList.html(newList);
+}
 function SelectUser() {
     alert("user clicked");
 }
