@@ -23,9 +23,9 @@
     <div id="modal_content" class="modal-body">
         @using (Ajax.BeginForm("Login", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "Start" }, new { Class = "form-search" }))
         {
-            <input id="login" name="login" class="input-xlarge" type="text" placeholder="Ваше имя" />
+            <input id="login" name="login" class="input-xlarge" type="text" placeholder="Your name" />
             <span id="login-error" class="help-inline error" style="display: none;"></span>
-            <button class="btn btn-success" type="submit">Войти в чат</button>
+            <button class="btn btn-success" type="submit">Save</button>
         }
     </div>
     <div class="modal-footer">
@@ -33,7 +33,9 @@
 </div>   
     <script type="text/javascript">
         function SetName() {
-            $("#login_modal").modal();
+            $("#login_modal").modal({
+                backdrop: true
+            });
             $("#login").focus();
         }
         
