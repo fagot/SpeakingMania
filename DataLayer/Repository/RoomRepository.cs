@@ -34,11 +34,11 @@ namespace SpeakingMania.DataLayer.Repository
         }
         public Room GetRoomByRoomKey(string key)
         {
-            Room registration = Session
+            Room room = Session
                     .CreateCriteria(typeof(Room))
                     .Add(Restrictions.Eq("RoomIdentity", key))
                     .UniqueResult<Room>();
-            return registration;
+            return room;
         }
     }
 }

@@ -7,9 +7,9 @@
     </id>
     <property name="RoomIdentity" />
     <property name="RoomName" />
-    <set name ="Users" lazy="true">
+    <bag name ="Users" lazy="true">
       <key column ="RoomId"/>
       <one-to-many class ="User"/>
-    </set>
+    </bag>
   </class>
 </hibernate-mapping>

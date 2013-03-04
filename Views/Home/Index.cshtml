@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿@{  
     ViewBag.Title = "Home Page";
 }
@@ -9,6 +10,20 @@
 <div class="well"> 
     <ul class="unstyled">
     </ul>
+=======
+﻿@{  
+    ViewBag.Title = "Home Page";
+}
+<div class="hero-unit">
+    <h4>@ViewBag.Message</h4>
+    <span>Logined as: </span>
+    <h4 id="userName"></h4>
+</div>
+          
+<div class="well"> 
+    <ul id="users" class="unstyled">
+    </ul>
+>>>>>>> 8067e6bc6a892cc0e773492507b97732def860b5
     @using (Html.BeginForm("Room", "Home", FormMethod.Post))
     {
         <input type="submit" id="btn_room_create" class="btn-success" value="Create a new room"/>
@@ -21,15 +36,20 @@
         <h3>Please fill the form</h3>
     </div>
     <div id="modal_content" class="modal-body">
-        @using (Ajax.BeginForm("Login", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "Start" }, new { Class = "form-search" }))
+        @using (Ajax.BeginForm("Login", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "Login" }, new { Class = "form-search" }))
         {
             <input id="login" name="login" class="input-xlarge" type="text" placeholder="Your name" />
             <span id="login-error" class="help-inline error" style="display: none;"></span>
+<<<<<<< HEAD
             <button class="btn btn-success" type="submit">Save</button>
+=======
+            <button class="btn btn-success" type="submit">Login</button>
+>>>>>>> 8067e6bc6a892cc0e773492507b97732def860b5
         }
     </div>
     <div class="modal-footer">
     </div>
+<<<<<<< HEAD
 </div>   
     <script type="text/javascript">
         function SetName() {
@@ -40,11 +60,19 @@
         }
         
     </script>
+=======
+</div>
+@section scripts
+{ 
+    @Scripts.Render("~/Scripts/app/main.js")
+
+>>>>>>> 8067e6bc6a892cc0e773492507b97732def860b5
     @if (ViewBag.Login != null && !String.IsNullOrEmpty(ViewBag.Login.ToString()))
     {
-        <script type="text/javascript">Start({ success: true, name: '@ViewBag.Login' });</script>
+        <script type="text/javascript"> Login({ success: true, name: '@ViewBag.Login' }); </script>
     }
     else
     {
-        <script type="text/javascript"> SetName();</script>
+        <script type="text/javascript"> SetName(); </script>
     }
+}
