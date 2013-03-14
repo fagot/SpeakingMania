@@ -21,7 +21,7 @@ namespace SpeakingMania.Controllers
                 ViewBag.MyKey = keyCook.Value;
             }
 
-            return View();
+            return View("Index");
         }
 
         public ActionResult About()
@@ -29,13 +29,9 @@ namespace SpeakingMania.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Room()
+        public ActionResult Room(string userId, string roomKey = null)
         {
-            string roomName = "TESt";
-            var hub = new UserHub();
-            var room = new Room { RoomIdentity = roomName, RoomName = roomName };
-            RoomRepository.Instance.Add(room);
-            hub.UpdateUsers(roomName);
+           
             return View("Room");
         }
         [HttpPost]
@@ -54,9 +50,11 @@ namespace SpeakingMania.Controllers
                 var loginCook = new HttpCookie("mylogin", HttpUtility.UrlEncode(login)) { Expires = DateTime.Now.AddDays(1) };
                 HttpContext.Response.Cookies.Add(loginCook);
 
-                return Json(new { success = true, name = login });
+                //return Json(new { success = true, name = login });
+                return Index();
             }
-            return Json(new { success = false, errors });
+            //return Json(new { success = false, errors });
+            return View("Index");
         }
     }
 }

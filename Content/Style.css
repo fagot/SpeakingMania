@@ -1,0 +1,15 @@
+﻿.mainBlock 
+{
+    min-height: 500px;
+}
+.usersBlock 
+{
+    min-height: 470px;
+    background-color: #E0ECF8;
+    margin-left: 0;
+}
+.roomsBlock 
+{
+    background-color: #E0ECF8;
+    min-height: 450px;
+}

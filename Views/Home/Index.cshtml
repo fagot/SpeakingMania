@@ -1,21 +1,29 @@
 ﻿@{  
     ViewBag.Title = "Home Page";
 }
-<div class="hero-unit">
+<div class="row well">
     <h4>@ViewBag.Message</h4>
     <span>Logined as: </span>
     <h4 id="userName"></h4>
 </div>
           
-<div class="well"> 
-    <ul id="users" class="unstyled">
-    </ul>
-    @using (Html.BeginForm("Room", "Home", FormMethod.Post))
-    {
-        <input type="submit" id="btn_room_create" class="btn-success" value="Create a new room"/>
-        <input type="hidden" id="isNew" value="1"/>
-    }
+<div class="row well mainBlock">
+    <div class="span2 well-small usersBlock">
+        <p class="text-info">Users online:</p> 
+        <ul id="users" class="unstyled">
+        </ul>
+    </div>
+    
+    <div class="span9">
+        <div class="well roomsBlock"></div>
+        @using (Ajax.BeginForm("Room", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "Room" }, new { Class = "form-search" }))
+        {
+            <input type="submit" id="btn_room_create" class="btn-success" value="Create a new room"/>
+            <input type="hidden" id="userId"/>
+        }
+    </div>
 </div>
+
 
 <div class="modal fade" id="login_modal">
     <div class="modal-header">

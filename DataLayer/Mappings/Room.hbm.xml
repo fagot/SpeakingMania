@@ -11,5 +11,6 @@
       <key column ="RoomId"/>
       <one-to-many class ="User"/>
     </bag>
+    <one-to-one name="RoomOwner" class ="User"/>
   </class>
 </hibernate-mapping>

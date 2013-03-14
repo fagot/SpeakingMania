@@ -48,6 +48,7 @@ namespace SpeakingMania.DataLayer.Repository
             try
             {
                 Session.Delete(entity);
+                Session.Flush();
             }
             catch (Exception ex)
             {
@@ -65,6 +66,11 @@ namespace SpeakingMania.DataLayer.Repository
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public List<T> GetAll()
+        {
+           return Session.Query<T>().ToList();
         }
     }
 }
