@@ -80,26 +80,7 @@ namespace SpeakingMania.Models
         }
         public void CreateRoom(string roomName, string userId)
         {
-            var user = UserRepository.Instance.GetUserByIdentity(userId);
-            if (user != null)
-            {
-                if (roomName == null)
-                {
-                    var room = new Room
-                        {
-                            RoomIdentity = Guid.NewGuid().ToString("N"),
-                            RoomName = roomName,
-                            RoomOwner = user
-                        };
-                    room.Users.Add(user);
-                    RoomRepository.Instance.Add(room);
-                }
-                
-            }
-            else
-            {
-                throw new Exception("User is not found in the DB");
-            } 
+           
         }
         public void UpdateUsers(string roomKey)
         {
@@ -118,6 +99,16 @@ namespace SpeakingMania.Models
         }
         public void UpdateRooms()
         {
+            var rooms = RoomRepository.Instance.GetAll();
+            var simpleRooms = new List<SimpleRoom>();
+            foreach (var r in rooms)
+            {
+                SimpleRoom room;
+                room.RoomIdentity = r.RoomIdentity;
+                room.RoomName = r.RoomName;
+                simpleRooms.Add(room);
+            }
+            Clients.All.OnUpdateRooms(simpleRooms);
             
         }
     }
@@ -127,5 +118,11 @@ namespace SpeakingMania.Models
         public string UserName;
         public string UserIdentity;
         public int RoomId;
+    }
+
+    struct SimpleRoom
+    {
+        public string RoomIdentity;
+        public string RoomName;
     }
 }

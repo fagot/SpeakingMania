@@ -1,19 +1,20 @@
-﻿var HUB = {};
-var OPTIONS = {};
-
+﻿var options = {};
+var isRoomOwner = false;
 function Login(data) {
+    var hub = {};
+    var options = {};
     if (data.success) {
         $("#login_modal").modal('hide');
         $("#userName").html(data.name);
         // Имя текущего пользователя
-        OPTIONS.MyName = data.name;
+        options.MyName = data.name;
         // Ключ комнаты чата
-        OPTIONS.RoomKey = 'MAIN';
+        options.RoomKey = 'MAIN';
         // Прокси-объект чата
-        HUB = $.connection.userHub;
-        HUB.client.OnJoinRoom = OnJoinRoom;
-        HUB.client.OnUpdateUsers = OnUpdateUsers;
-        HUB.client.OnUpdateRooms = OnUpdateRooms;
+        hub = $.connection.userHub;
+        hub.client.OnJoinRoom = OnJoinRoom;
+        hub.client.OnUpdateUsers = OnUpdateUsers;
+        hub.client.OnUpdateRooms = OnUpdateRooms;
 
 
     } else {
@@ -22,6 +23,7 @@ function Login(data) {
     }
 
     $('#users').delegate('li', 'click', SelectUser);
+    $('#rooms').delegate('tr', 'click', SelectRoom);
 
     //$("#msg").keydown(function (e) {
     //    if (e.keyCode == 13 && !e.shiftKey) {
@@ -32,23 +34,45 @@ function Login(data) {
     //});
 
     $.connection.hub.start(function () {
-        HUB.server.joinRoom(OPTIONS.RoomKey, OPTIONS.MyName);
+        hub.server.joinRoom(options.RoomKey, options.MyName);
+        hub.server.updateRooms();
     });
 }
 
-function Room(data) {
-    HUB.client.OnCreateRoom = OnCreateRoom;
+function CreateRoom(data) {
+    var hub = {};
+    var options = {};
+    if (data.success) {
+        hub = $.connection.userHub;
+        hub.client.OnUpdateRooms = OnUpdateRooms;
+        options.roomName = data.roomName;
+        options.roomKey = data.roomKey;
+        options.userId = data.userId;
+        isRoomOwner = data.isRoomOwner;
+        $("#new_room_modal").modal('hide');        
+       
+        hub.server.updateRooms();
+        
+        
+    }
+    else {
+        $("#roomForm").addClass("error");
+        $("#room-error").html(data.errors["room"]).show();
+    }
 }
 
 
 
-function SetName() {
+function SetNameDialog() {
     $("#login_modal").modal();
     $("#login").focus();
 }
+function CreateRoomDialog() {
+    $("#new_room_modal").modal();
+    $("#roomName").focus();
+}
 function OnJoinRoom(key) {
     //alert("join");
-    OPTIONS.MyKey = key;
     $("#userId").val(key);
 
 }
@@ -70,8 +94,24 @@ function OnCreateRoom() {
     alert("room create");
 }
 function OnUpdateRooms(data) {
+    
+    var roomsList = $("#rooms"),
+           newList = "";
+    for (var i = 0; i < data.length; i++) {
+        var room = data[i];
+        newList += '<tr data-key="' + room.RoomIdentity + '" class="info"><td><i class="icon-comments icon-large" style="color:#FFBF00"></i></td><td>' + room.RoomName + '</td></tr>';
+
+    }
+    roomsList.html(newList);
+    
+    if (isRoomOwner) {
+        document.location = 'Home/Room';
+    }
 }
 
 function SelectUser() {
     alert("user clicked");
+}
+function SelectRoom() {
+    alert("room clicked");
 }

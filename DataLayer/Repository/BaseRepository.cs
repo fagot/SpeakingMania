@@ -35,7 +35,14 @@ namespace SpeakingMania.DataLayer.Repository
         {
             try
             {
-                Session.Save(entity);
+                lock (Session)
+                {
+                    using (var transaction = Session.BeginTransaction())
+                    {
+                        Session.Save(entity);
+                        transaction.Commit();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -47,8 +54,14 @@ namespace SpeakingMania.DataLayer.Repository
         {
             try
             {
-                Session.Delete(entity);
-                Session.Flush();
+                lock (Session)
+                {
+                    using (var transaction = Session.BeginTransaction())
+                    {
+                        Session.Delete(entity);
+                        transaction.Commit();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -60,7 +73,14 @@ namespace SpeakingMania.DataLayer.Repository
         {
             try
             {
-                Session.SaveOrUpdate(entity);
+                lock (Session)
+                {
+                    using (var transaction = Session.BeginTransaction())
+                    {
+                        Session.SaveOrUpdate(entity);
+                        transaction.Commit();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -70,7 +90,16 @@ namespace SpeakingMania.DataLayer.Repository
 
         public List<T> GetAll()
         {
-           return Session.Query<T>().ToList();
+            List<T> list;
+            lock (Session)
+            {
+                using (var transaction = Session.BeginTransaction())
+                {
+                    list = Session.Query<T>().ToList();
+                    transaction.Commit();
+                }
+            }
+            return list;
         }
     }
 }

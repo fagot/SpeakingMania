@@ -26,18 +26,35 @@ namespace SpeakingMania.DataLayer.Repository
         }
         public Room GetRoomByRoomName(string name)
         {
-            Room registration = Session
-                    .CreateCriteria(typeof(Room))
-                    .Add(Restrictions.Eq("RoomName", name))
-                    .UniqueResult<Room>();
-            return registration;
+            Room room;
+            lock (Session)
+            {
+                using (var transaction = Session.BeginTransaction())
+                {
+                    room = Session
+                        .CreateCriteria(typeof (Room))
+                        .Add(Restrictions.Eq("RoomName", name))
+                        .UniqueResult<Room>();
+                    transaction.Commit();
+                }
+            }
+            return room;
         }
         public Room GetRoomByRoomKey(string key)
         {
-            Room room = Session
-                    .CreateCriteria(typeof(Room))
-                    .Add(Restrictions.Eq("RoomIdentity", key))
-                    .UniqueResult<Room>();
+
+            Room room;
+            lock (Session)
+            {
+                using (var transaction = Session.BeginTransaction())
+                {
+                    room = Session
+                        .CreateCriteria(typeof (Room))
+                        .Add(Restrictions.Eq("RoomIdentity", key))
+                        .UniqueResult<Room>();
+                    transaction.Commit();
+                }
+            }
             return room;
         }
     }

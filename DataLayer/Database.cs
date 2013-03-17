@@ -11,23 +11,25 @@ namespace SpeakingMania.DataLayer
     public static class Database
     {
         private static ISessionFactory _sessionFactory;
-
+        private static object _sync = new object();
         private static ISessionFactory SessionFactory
         {
             get
             {
-                if (_sessionFactory == null)
+                lock (_sync)
                 {
-                    var configuration = new Configuration();
+                    if (_sessionFactory == null)
+                    {
+                        var configuration = new Configuration();
 
-                    configuration.Configure();
-                    //configuration.AddAssembly("SpeakingMania");
-                    
-                    
+                        configuration.Configure();
+                        //configuration.AddAssembly("SpeakingMania");
 
-                    _sessionFactory = configuration.BuildSessionFactory();
+
+
+                        _sessionFactory = configuration.BuildSessionFactory();
+                    }
                 }
-
                 return _sessionFactory;
             }
         }

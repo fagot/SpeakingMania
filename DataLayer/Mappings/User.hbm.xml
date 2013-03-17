@@ -7,7 +7,7 @@
     </id>
     <property name="UserIdentity" />
     <property name="UserName" />
-    <many-to-one name="Room" column ="RoomId"/>
+	<many-to-one name="Room" column ="RoomId"/>
    
   </class>
 </hibernate-mapping>

@@ -26,18 +26,34 @@ namespace SpeakingMania.DataLayer.Repository
         }
         public User GetUserById(int Id)
         {
-            var user = Session
-                    .CreateCriteria(typeof(User))
-                    .Add(Restrictions.Eq("Id", Id))
-                    .UniqueResult<User>();
+            User user;
+            lock (Session)
+            {
+                using (var transaction = Session.BeginTransaction())
+                {
+                    user = Session
+                        .CreateCriteria(typeof (User))
+                        .Add(Restrictions.Eq("Id", Id))
+                        .UniqueResult<User>();
+                    transaction.Commit();
+                }
+            }
             return user;
         }
         public User GetUserByIdentity(string identity)
         {
-            var user = Session
-                    .CreateCriteria(typeof(User))
-                    .Add(Restrictions.Eq("UserIdentity", identity))
-                    .UniqueResult<User>();
+            User user;
+            lock (Session)
+            {
+                using (var transaction = Session.BeginTransaction())
+                {
+                    user = Session
+                        .CreateCriteria(typeof (User))
+                        .Add(Restrictions.Eq("UserIdentity", identity))
+                        .UniqueResult<User>();
+                    transaction.Commit();
+                }
+            }
             return user;
         }
 
