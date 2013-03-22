@@ -34,7 +34,8 @@ function Login(data) {
     //});
 
     $.connection.hub.start(function () {
-        hub.server.joinRoom(options.RoomKey, options.MyName);
+        hub.server.login(options.MyName);
+        hub.server.joinRoom(options.RoomKey);
         hub.server.updateRooms();
     });
 }
@@ -49,10 +50,12 @@ function CreateRoom(data) {
         options.roomKey = data.roomKey;
         options.userId = data.userId;
         isRoomOwner = data.isRoomOwner;
-        $("#new_room_modal").modal('hide');        
-       
+        $("#new_room_modal").modal('hide');
+        hub.server.joinRoom(options.roomKey);
         hub.server.updateRooms();
-        
+        if (isRoomOwner) {
+            //document.location = 'Home/Room';
+        }
         
     }
     else {
@@ -104,9 +107,6 @@ function OnUpdateRooms(data) {
     }
     roomsList.html(newList);
     
-    if (isRoomOwner) {
-        document.location = 'Home/Room';
-    }
 }
 
 function SelectUser() {

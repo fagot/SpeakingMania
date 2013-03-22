@@ -18,7 +18,11 @@ namespace SpeakingMania.Models
         #region Properties
         private static List<Room> _roomStore;
         private static List<User> _userStore;
-        public List<User> UserStore
+        public UserHub()
+        {
+            
+        }
+        public static List<User> UserStore
         {
             get
             {
@@ -33,7 +37,7 @@ namespace SpeakingMania.Models
                 }
             }
         }
-        public List<Room> RoomStore
+        public static List<Room> RoomStore
         {
             get
             {
@@ -49,6 +53,13 @@ namespace SpeakingMania.Models
             }
         }
         #endregion
+        public override Task OnConnected()
+        {
+            var romm = RoomRepository.Instance.GetRoomByRoomKey("MAIN");
+            var user = new User { UserIdentity = Context.ConnectionId, UserName = "", Room = romm };
+            UserStore.Add(user);
+            return base.OnConnected();
+        }
         public override Task OnDisconnected()
         {
             var us = UserStore.FirstOrDefault(u => u.UserIdentity == Context.ConnectionId);
@@ -60,27 +71,54 @@ namespace SpeakingMania.Models
             }
             return base.OnDisconnected();
         }
-        public void Send(string name, string message)
+        public void Login(string name)
         {
-            Clients.All.broadcastMessage(name, message);
+            var user = UserStore.FirstOrDefault(u => u.UserIdentity == Context.ConnectionId);
+            user.UserName = name;
+            UserRepository.Instance.Add(user);
         }
-        public void JoinRoom(string roomKey, string myName)
+        public void JoinRoom(string roomKey)
         {
             var room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
             var user = UserStore.FirstOrDefault(u => u.UserIdentity == Context.ConnectionId);
-            if (user == null)
-            {
-                user = new User {Room = room, UserIdentity = Context.ConnectionId, UserName = myName};
-            }
-            UserStore.Add(user);
             Groups.Add(Context.ConnectionId, roomKey);
             Clients.Client(user.UserIdentity).OnJoinRoom(user.UserIdentity);
+            user.Room = room;
             UserRepository.Instance.Update(user);
             UpdateUsers(room.RoomIdentity);
         }
-        public void CreateRoom(string roomName, string userId)
+        public static Room CreateRoom(string roomName, string userId)
         {
-           
+            var user = UserRepository.Instance.GetUserByIdentity(userId);
+            if (user != null)
+            {
+                var room = new Room
+                    {
+                        RoomIdentity = Guid.NewGuid().ToString("N"),
+                        RoomName = roomName,
+                        RoomOwner = user,
+                        Users = new List<User>()
+                    };
+                room.Users.Add(user);
+                if (RoomRepository.Instance.GetRoomByRoomName(roomName) == null)
+                {
+                    RoomRepository.Instance.Add(room);
+                    RoomStore.Add(room);
+                    user.Room = room;
+                    UserRepository.Instance.Update(user);
+                    return room;
+                }
+                else
+                {
+                    throw new RoomCreatingException("room with name \"" + room.RoomName + "\" is already exist");
+                }
+
+
+            }
+            else
+            {
+                throw new Exception("User is not found in the DB");
+            }
         }
         public void UpdateUsers(string roomKey)
         {

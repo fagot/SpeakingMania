@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using SpeakingMania.DataLayer.Repository;
 using SpeakingMania.DataLayer.Models;
@@ -10,67 +12,72 @@ namespace SpeakingMania.Controllers
 {
     public class HomeController : Controller
     {
+        private UserHub hub;
         public ActionResult Index()
         {
             var cook = Request.Cookies["mylogin"];
             var keyCook = Request.Cookies["mykey"];
-
+            var roomKey = Session["roomKey"];
+            if (roomKey != null && (string)roomKey != "MAIN")
+            {
+                //return Room();
+            }
             if (cook != null && keyCook != null && !String.IsNullOrEmpty(keyCook.Value))
             {
                 ViewBag.Login = HttpUtility.UrlDecode(cook.Value);
                 ViewBag.MyKey = keyCook.Value;
+                //var user = UserRepository.Instance.GetUserByIdentity(keyCook.Value);
+                //if (user.Room.RoomName != "MAIN")
+                //{
+                //    return Room();
+                //}
+                
             }
+            
 
             return View("Index");
         }
-
         public ActionResult About()
         {
             return View();
         }
         [HttpPost]
-        public ActionResult JoinRoom(string userId, string roomName = null, string roomKey = null)
+        public JsonResult JoinRoom(string userId, string roomName = null, string roomKey = null)
         {
             var errors = new Dictionary<string, string>();
-            var user = UserRepository.Instance.GetUserByIdentity(userId);
-            if (user != null)
+            Room room = null;
+            JsonResult result = null;
+            try
             {
-                Session.Add("userId", user.UserIdentity);
                 if (roomName != null)
                 {
-                    Session.Add("isRoomOwner", true);
-                    var room = new Room
-                    {
-                        RoomIdentity = Guid.NewGuid().ToString("N"),
-                        RoomName = roomName,
-                        RoomOwner = user,
-                        Users = new List<User>()
-                    };
-                    room.Users.Add(user);
-                    if (RoomRepository.Instance.GetRoomByRoomName(roomName) == null)
-                    {
-                        RoomRepository.Instance.Add(room);
-                        Session.Add("roomKey", room.RoomIdentity);
-                        return Json(new {success = true, roomName = room.RoomName, roomKey = room.RoomIdentity, userId = user.UserIdentity, isRoomOwner = true});
-                    }
-                    else
-                    {
-                        errors.Add("room", "The room with the name \""+room.RoomName+"\" is already exist");
-                        return Json(new { success = false, errors });
-                    }
+                    room = UserHub.CreateRoom(roomName, userId);
                 }
                 else if (roomKey != null)
                 {
-                    Session.Add("isRoomOwner", false);
-                    Session.Add("roomKey", roomKey);
+                    room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
                 }
-
+                Session.Add("userId", userId);
+                Session.Add("isRoomOwner", true);
+                Session.Add("roomKey", room.RoomIdentity);
+                result =
+                    Json(
+                        new
+                            {
+                                success = true,
+                                roomName = room.RoomName,
+                                roomKey = room.RoomIdentity,
+                                userId = userId,
+                                isRoomOwner = true
+                            });
             }
-            else
+            catch (RoomCreatingException ex)
             {
-                throw new Exception("User is not found in the DB");
-            } 
-            return View("Room");
+                errors.Add("room", ex.Message);
+                result = Json(new {success = false, errors = errors});
+            }
+            return result;
+
         }
          public ActionResult Room()
          {
@@ -84,6 +91,7 @@ namespace SpeakingMania.Controllers
                  ViewBag.IsOwner = isOwner;
                  var user = UserRepository.Instance.GetUserByIdentity(userId);
                  var room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
+                 ViewBag.RoomName = room.RoomName;
                  if (isOwner)
                  {
                      
@@ -106,7 +114,6 @@ namespace SpeakingMania.Controllers
 
                 var loginCook = new HttpCookie("mylogin", HttpUtility.UrlEncode(login)) { Expires = DateTime.Now.AddDays(1) };
                 HttpContext.Response.Cookies.Add(loginCook);
-
                 return Json(new { success = true, name = login });
                 //return Index();
             }

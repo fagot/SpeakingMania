@@ -129,6 +129,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\RoomCreatingException.cs" />
     <Compile Include="Models\RoomHub.cs" />
     <Compile Include="Models\UserHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
