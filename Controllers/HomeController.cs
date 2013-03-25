@@ -3,6 +3,8 @@ using System.Text;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
 using SpeakingMania.DataLayer.Repository;
 using SpeakingMania.DataLayer.Models;
 using System;
@@ -12,26 +14,22 @@ namespace SpeakingMania.Controllers
 {
     public class HomeController : Controller
     {
-        private UserHub hub;
+        private string _userId;  
         public ActionResult Index()
         {
             var cook = Request.Cookies["mylogin"];
             var keyCook = Request.Cookies["mykey"];
-            var roomKey = Session["roomKey"];
-            if (roomKey != null && (string)roomKey != "MAIN")
-            {
-                //return Room();
-            }
+            
             if (cook != null && keyCook != null && !String.IsNullOrEmpty(keyCook.Value))
             {
                 ViewBag.Login = HttpUtility.UrlDecode(cook.Value);
                 ViewBag.MyKey = keyCook.Value;
-                //var user = UserRepository.Instance.GetUserByIdentity(keyCook.Value);
-                //if (user.Room.RoomName != "MAIN")
-                //{
-                //    return Room();
-                //}
-                
+                //if (_userId == null)
+                    //var user = UserRepository.Instance.GetUserByIdentity(_userId);
+                    //if (user.Room.RoomName!="MAIN")
+                    //{
+                    //    return Room();
+                    //}
             }
             
 
@@ -46,18 +44,18 @@ namespace SpeakingMania.Controllers
         {
             var errors = new Dictionary<string, string>();
             Room room = null;
+            var user = UserStore.FindById(userId);
             JsonResult result = null;
             try
             {
                 if (roomName != null)
                 {
-                    room = UserHub.CreateRoom(roomName, userId);
+                    room = RoomStore.Add(roomName, user);
                 }
                 else if (roomKey != null)
                 {
                     room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
                 }
-                Session.Add("userId", userId);
                 Session.Add("isRoomOwner", true);
                 Session.Add("roomKey", room.RoomIdentity);
                 result =
@@ -92,6 +90,7 @@ namespace SpeakingMania.Controllers
                  var user = UserRepository.Instance.GetUserByIdentity(userId);
                  var room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
                  ViewBag.RoomName = room.RoomName;
+                 ViewBag.UserName = user.UserName;
                  if (isOwner)
                  {
                      
@@ -103,12 +102,13 @@ namespace SpeakingMania.Controllers
         public ActionResult Login(string login)
         {
             var errors = new Dictionary<string, string>();
+            
             if (!String.IsNullOrEmpty(login) && login.Length < 255)
             {
                 var keyCook = Request.Cookies["mykey"];
                 if (keyCook == null)
                 {
-                    keyCook = new HttpCookie("mykey", Guid.NewGuid().ToString("N"));
+                    keyCook = new HttpCookie("mykey", "");
                     HttpContext.Response.Cookies.Add(keyCook);
                 }
 
@@ -119,6 +119,15 @@ namespace SpeakingMania.Controllers
             }
             return Json(new { success = false, errors });
             //return View("Index");
+        }
+        private string UserLogin()
+        {
+            DefaultHubManager hd = new DefaultHubManager(GlobalHost.DependencyResolver);
+            var hub = hd.ResolveHub("UserHub") as UserHub;
+            hub.JoinRoom("MAIN");
+            var user = UserRepository.Instance.GetUserByIdentity(hub.Context.ConnectionId);
+            _userId = user.UserIdentity;
+            return user.UserIdentity;
         }
     }
 }

@@ -32,7 +32,7 @@ function Login(data) {
     //    }
     //    return true;
     //});
-
+    //alert("LOGIN");
     $.connection.hub.start(function () {
         hub.server.login(options.MyName);
         hub.server.joinRoom(options.RoomKey);

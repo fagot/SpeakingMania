@@ -57,5 +57,22 @@ namespace SpeakingMania.DataLayer.Repository
             return user;
         }
 
+        public User GetUserByName(string name)
+        {
+            User user;
+            lock (Session)
+            {
+                using (var transaction = Session.BeginTransaction())
+                {
+                    user = Session
+                        .CreateCriteria(typeof(User))
+                        .Add(Restrictions.Eq("UserName", name))
+                        .UniqueResult<User>();
+                    transaction.Commit();
+                }
+            }
+            return user;
+        }
+
     }
 }

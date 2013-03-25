@@ -131,7 +131,10 @@
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\RoomCreatingException.cs" />
     <Compile Include="Models\RoomHub.cs" />
+    <Compile Include="Models\RoomStore.cs" />
+    <Compile Include="Models\UserCreatingException.cs" />
     <Compile Include="Models\UserHub.cs" />
+    <Compile Include="Models\UserStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

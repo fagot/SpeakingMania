@@ -16,42 +16,11 @@ namespace SpeakingMania.Models
     public class UserHub : Hub
     {
         #region Properties
-        private static List<Room> _roomStore;
-        private static List<User> _userStore;
         public UserHub()
         {
             
         }
-        public static List<User> UserStore
-        {
-            get
-            {
-                if (_userStore == null)
-                {
-                    _userStore = UserRepository.Instance.GetAll();
-                    return _userStore;
-                }
-                else
-                {
-                    return _userStore;
-                }
-            }
-        }
-        public static List<Room> RoomStore
-        {
-            get
-            {
-                if (_roomStore == null)
-                {
-                    _roomStore = RoomRepository.Instance.GetAll();
-                    return _roomStore;
-                }
-                else
-                {
-                    return _roomStore;
-                }
-            }
-        }
+
         #endregion
         public override Task OnConnected()
         {
@@ -62,68 +31,41 @@ namespace SpeakingMania.Models
         }
         public override Task OnDisconnected()
         {
-            var us = UserStore.FirstOrDefault(u => u.UserIdentity == Context.ConnectionId);
+            var us = UserStore.FindById(Context.ConnectionId);
             if (us != null)
             {
                 UserStore.Remove(us);
-                UserRepository.Instance.Remove(us);
                 UpdateUsers(us.Room.RoomIdentity);
             }
             return base.OnDisconnected();
         }
         public void Login(string name)
         {
-            var user = UserStore.FirstOrDefault(u => u.UserIdentity == Context.ConnectionId);
+            var user = UserStore.FindById(Context.ConnectionId);
             user.UserName = name;
-            UserRepository.Instance.Add(user);
+            UserStore.Update(user);
         }
         public void JoinRoom(string roomKey)
         {
             var room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
-            var user = UserStore.FirstOrDefault(u => u.UserIdentity == Context.ConnectionId);
+            var user = UserStore.FindById(Context.ConnectionId);
             Groups.Add(Context.ConnectionId, roomKey);
             Clients.Client(user.UserIdentity).OnJoinRoom(user.UserIdentity);
             user.Room = room;
             UserRepository.Instance.Update(user);
             UpdateUsers(room.RoomIdentity);
         }
-        public static Room CreateRoom(string roomName, string userId)
-        {
-            var user = UserRepository.Instance.GetUserByIdentity(userId);
-            if (user != null)
-            {
-                var room = new Room
-                    {
-                        RoomIdentity = Guid.NewGuid().ToString("N"),
-                        RoomName = roomName,
-                        RoomOwner = user,
-                        Users = new List<User>()
-                    };
-                room.Users.Add(user);
-                if (RoomRepository.Instance.GetRoomByRoomName(roomName) == null)
-                {
-                    RoomRepository.Instance.Add(room);
-                    RoomStore.Add(room);
-                    user.Room = room;
-                    UserRepository.Instance.Update(user);
-                    return room;
-                }
-                else
-                {
-                    throw new RoomCreatingException("room with name \"" + room.RoomName + "\" is already exist");
-                }
-
-
-            }
-            else
-            {
-                throw new Exception("User is not found in the DB");
-            }
-        }
+         public static User AddUser(string userName)
+         {
+             var user = new User {UserName = userName};
+             UserStore.Add(user);
+             return user;
+         }
+       
         public void UpdateUsers(string roomKey)
         {
             var simpleUsers = new List<SimpleUser>();
-            var users = UserStore.Where(u => u.Room.RoomIdentity == roomKey).ToList();
+            var users = UserStore.FindByRoomKey(roomKey);
             foreach (var u in users)
             {
                 SimpleUser user;

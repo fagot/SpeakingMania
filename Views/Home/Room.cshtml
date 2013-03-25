@@ -1,8 +1,11 @@
-﻿@{
-    ViewBag.Title = "Room";
+﻿@{  
+    ViewBag.Title = "Room: "+ViewBag.RoomName;
 }
-
-<h2>Room</h2>
+<div class="row well">
+    <h4>@ViewBag.Message</h4>
+    <span>Logined as: </span>
+    <h4 id="userName">@ViewBag.UserName</h4>
+</div>
 
 <h3>@ViewBag.RoomName</h3>
 <input type="hidden" id="userId" value="@ViewBag.UserId"/>
