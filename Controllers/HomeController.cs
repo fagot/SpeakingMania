@@ -40,6 +40,19 @@ namespace SpeakingMania.Controllers
             return View();
         }
         [HttpPost]
+        public JsonResult SaveUserData(string userId)
+        {
+            try
+            {
+                ViewBag.UserId = userId;
+            }
+            catch (Exception)
+            {
+                return Json(new {success = false});
+            }
+            return Json(new { success = true });
+        }
+        [HttpPost]
         public JsonResult JoinRoom(string userId, string roomName = null, string roomKey = null)
         {
             var errors = new Dictionary<string, string>();
@@ -51,12 +64,16 @@ namespace SpeakingMania.Controllers
                 if (roomName != null)
                 {
                     room = RoomStore.Add(roomName, user);
+                    Session.Add("isRoomOwner", true);
                 }
                 else if (roomKey != null)
                 {
                     room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
-                }
-                Session.Add("isRoomOwner", true);
+                    room.Users.Add(user);
+                    user.Room = room;
+                    UserStore.Update(user);
+                    Session.Add("isRoomOwner", false);
+                }               
                 Session.Add("roomKey", room.RoomIdentity);
                 result =
                     Json(
@@ -77,7 +94,7 @@ namespace SpeakingMania.Controllers
             return result;
 
         }
-         public ActionResult Room()
+        public ActionResult Room()
          {
              var roomKey = Session["roomKey"].ToString();
              var userId = Session["userId"].ToString();
@@ -123,6 +140,7 @@ namespace SpeakingMania.Controllers
         private string UserLogin()
         {
             DefaultHubManager hd = new DefaultHubManager(GlobalHost.DependencyResolver);
+            
             var hub = hd.ResolveHub("UserHub") as UserHub;
             hub.JoinRoom("MAIN");
             var user = UserRepository.Instance.GetUserByIdentity(hub.Context.ConnectionId);

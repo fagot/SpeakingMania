@@ -74,9 +74,19 @@ function CreateRoomDialog() {
     $("#new_room_modal").modal();
     $("#roomName").focus();
 }
+function JoinRoomDialog() {
+    $("#join_room_modal").modal();
+}
 function OnJoinRoom(key) {
     //alert("join");
-    $("#userId").val(key);
+    //$.post("Home/SaveUserData", { userId: key }, function (data) {
+    //    //do whatever with the response
+
+    //});
+    $("input[name='userId']").each(function (k, v) {
+        $(v).val(key);
+    });
+    $("#join_room_modal").modal('hide');
 
 }
 
@@ -113,5 +123,7 @@ function SelectUser() {
     alert("user clicked");
 }
 function SelectRoom() {
-    alert("room clicked");
+    $("#lbl_roomName").text($(this).children("td").eq(1).html());
+    $("#roomKey").val($(this).attr("data-key"));
+    JoinRoomDialog();
 }
