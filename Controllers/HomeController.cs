@@ -125,13 +125,13 @@ namespace SpeakingMania.Controllers
                 var keyCook = Request.Cookies["mykey"];
                 if (keyCook == null)
                 {
-                    keyCook = new HttpCookie("mykey", "");
+                    keyCook = new HttpCookie("mykey", Guid.NewGuid().ToString("N"));
                     HttpContext.Response.Cookies.Add(keyCook);
                 }
 
                 var loginCook = new HttpCookie("mylogin", HttpUtility.UrlEncode(login)) { Expires = DateTime.Now.AddDays(1) };
                 HttpContext.Response.Cookies.Add(loginCook);
-                return Json(new { success = true, name = login });
+                return Json(new { success = true, name = login, key = keyCook.Value });
                 //return Index();
             }
             return Json(new { success = false, errors });

@@ -50,7 +50,7 @@ namespace SpeakingMania.Models
             var room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
             var user = UserStore.FindById(Context.ConnectionId);
             Groups.Add(Context.ConnectionId, roomKey);
-            Clients.Client(user.UserIdentity).OnJoinRoom(user.UserIdentity);
+            Clients.Client(user.UserIdentity).OnJoinRoom(user.UserIdentity, roomKey);
             user.Room = room;
             UserRepository.Instance.Update(user);
             UpdateUsers(room.RoomIdentity);

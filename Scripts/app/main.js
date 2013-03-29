@@ -65,7 +65,7 @@ function CreateRoom(data) {
 }
 
 
-
+/* Dialogs */
 function SetNameDialog() {
     $("#login_modal").modal();
     $("#login").focus();
@@ -77,14 +77,42 @@ function CreateRoomDialog() {
 function JoinRoomDialog() {
     $("#join_room_modal").modal();
 }
-function OnJoinRoom(key) {
-    //alert("join");
+/* Dialogs end*/
+
+/* Login dialod navigation */
+function SignIn() {
+    $("#signInForm").show();
+    $("#signUpForm").hide();
+    $("#logIn").hide();
+}
+function SignUp() {
+    $("#signInForm").hide();
+    $("#signUpForm").show();
+    $("#logIn").hide();
+}
+
+function LogIn() {
+    $("#signInForm").hide();
+    $("#signUpForm").hide();
+    $("#logIn").show();
+}
+/* Login dialod navigation end*/
+
+function OnJoinRoom(userId, roomKey) {
+    //alert(roomKey);
     //$.post("Home/SaveUserData", { userId: key }, function (data) {
     //    //do whatever with the response
 
     //});
+    if (roomKey != 'MAIN') {
+        $("#roomsBlock").addClass('hidden');
+        $("#privateBlock").removeClass('hidden');
+    } else {
+        $("#roomsBlock").removeClass('hidden');
+        $("#privateBlock").addClass('hidden');
+    }
     $("input[name='userId']").each(function (k, v) {
-        $(v).val(key);
+        $(v).val(userId);
     });
     $("#join_room_modal").modal('hide');
 
@@ -126,4 +154,7 @@ function SelectRoom() {
     $("#lbl_roomName").text($(this).children("td").eq(1).html());
     $("#roomKey").val($(this).attr("data-key"));
     JoinRoomDialog();
+}
+
+function LeaveRoom() {
 }
