@@ -2,22 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using SpeakingMania.DataLayer.Models;
-using SpeakingMania.DataLayer.Repository;
+using SpeakingMania.DataLayer;
 
 namespace SpeakingMania.Models
 {
     public static class RoomStore
     {
-        private static List<Room> _roomStore;
+         private static List<Room> _roomStore;
         public static List<Room> Rooms
         {
             get
             {
                 if (_roomStore == null)
                 {
-                    _roomStore = RoomRepository.Instance.GetAll();
-                    return _roomStore;
+                    using (var ctx = new SpeakingManiaEntities())
+                    {
+                        _roomStore = ctx.Room.ToList();
+                        return _roomStore;
+                    }
                 }
                 else
                 {
@@ -27,57 +29,40 @@ namespace SpeakingMania.Models
         } 
         public static bool CheckRoomName(string roomName)
         {
-            if (RoomRepository.Instance.GetRoomByRoomName(roomName) != null)
+            if (Rooms.First(r=>r.RoomName==roomName)!=null)
                 return true;
             else
                 return false;
         }
         public static void Remove(Room room)
         {
-            Rooms.Remove(room);
-            RoomRepository.Instance.Remove(room);
+            using (var ctx = new SpeakingManiaEntities())
+            {
+                Rooms.Remove(room);
+                ctx.Room.Remove(room);
+            }
         }
-
+        
         public static void Update(Room room)
         {
-            var rm = Rooms.FirstOrDefault(u => u.RoomIdentity == room.RoomIdentity);
-            rm = room;
-            RoomRepository.Instance.Update(rm);
+            using (var ctx = new SpeakingManiaEntities())
+            {
+                var rm = Rooms.FirstOrDefault(u => u.RoomIdentity == room.RoomIdentity);
+                rm = room;
+                ctx.Room.Attach(rm);
+            }
         }
-        public static Room Add(string roomName, UserProfile user)
+        public static void Add(Room room)
         {
-            if (user != null)
+            using (var ctx = new SpeakingManiaEntities())
             {
-                var room = new Room
-                {
-                    RoomIdentity = Guid.NewGuid().ToString("N"),
-                    RoomName = roomName,
-                    RoomOwner = user,
-                    Users = new List<UserProfile>()
-                };
-                room.Users.Add(user);
-                if (RoomRepository.Instance.GetRoomByRoomName(roomName) == null)
-                {
-                    RoomRepository.Instance.Add(room);
-                    Rooms.Add(room);
-                    user.Room = room;
-                    UserRepository.Instance.Update(user);
-                    return room;
-                }
-                else
-                {
-                    throw new RoomCreatingException("room with name \"" + room.RoomName + "\" is already exist");
-                }
-
-
+                Rooms.Add(room);
+                ctx.Room.Add(room);
             }
-            else
-            {
-                throw new Exception("User is not found in the DB");
-            }
+
         }
 
-        public static Room FindById(string identity)
+        public static Room FindByKey(string identity)
         {
             var room = Rooms.FirstOrDefault(r => r.RoomIdentity == identity);
             return room;

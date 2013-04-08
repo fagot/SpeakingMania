@@ -5,8 +5,7 @@ using System.Web.Helpers;
 using System.Web.Mvc;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
-using SpeakingMania.DataLayer.Repository;
-using SpeakingMania.DataLayer.Models;
+using SpeakingMania.DataLayer;
 using System;
 using SpeakingMania.Models;
 
@@ -55,9 +54,9 @@ namespace SpeakingMania.Controllers
         [HttpPost]
         public JsonResult JoinRoom(string userId, string roomName = null, string roomKey = null)
         {
-            var errors = new Dictionary<string, string>();
+            /*var errors = new Dictionary<string, string>();
             Room room = null;
-            var user = UserStore.FindById(userId);
+            var user = ConnectionStore.FindById(userId);
             JsonResult result = null;
             try
             {
@@ -71,7 +70,7 @@ namespace SpeakingMania.Controllers
                     room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
                     room.Users.Add(user);
                     user.Room = room;
-                    UserStore.Update(user);
+                    ConnectionStore.Update(user);
                     Session.Add("isRoomOwner", false);
                 }               
                 Session.Add("roomKey", room.RoomIdentity);
@@ -90,13 +89,13 @@ namespace SpeakingMania.Controllers
             {
                 errors.Add("room", ex.Message);
                 result = Json(new {success = false, errors = errors});
-            }
-            return result;
+            }*/
+            return null;
 
         }
         public ActionResult Room()
          {
-             var roomKey = Session["roomKey"].ToString();
+             /*var roomKey = Session["roomKey"].ToString();
              var userId = Session["userId"].ToString();
              var isOwner = Convert.ToBoolean(Session["isRoomOwner"]);
              if (!String.IsNullOrEmpty(roomKey) && !String.IsNullOrEmpty(userId))
@@ -112,7 +111,7 @@ namespace SpeakingMania.Controllers
                  {
                      
                  }
-             }
+             }*/
              return View("Room");
          }
         [HttpPost]
@@ -137,15 +136,20 @@ namespace SpeakingMania.Controllers
             return Json(new { success = false, errors });
             //return View("Index");
         }
-        private string UserLogin()
+        [HttpPost]
+        public ActionResult Register(string inputEmail, string inputLoginRegister, string inputPasswordRegister)
         {
-            DefaultHubManager hd = new DefaultHubManager(GlobalHost.DependencyResolver);
-            
-            var hub = hd.ResolveHub("UserHub") as UserHub;
-            hub.JoinRoom("MAIN");
-            var user = UserRepository.Instance.GetUserByIdentity(hub.Context.ConnectionId);
-            _userId = user.UserIdentity;
-            return user.UserIdentity;
+            var keyCook = Request.Cookies["mykey"];
+            string key = "";
+            if (keyCook != null)
+                key = keyCook.Value;
+            var newUser = new UserProfile { Password = inputPasswordRegister, UserIdentity = key, UserName = inputLoginRegister };
+            using (var ctx = new SpeakingManiaEntities())
+            {
+                ctx.UserProfile.Add(newUser);
+                ctx.SaveChanges();
+            }
+            return RedirectToAction("Index");
         }
     }
 }

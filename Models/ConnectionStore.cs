@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using SpeakingMania.DataLayer.Models;
-using SpeakingMania.DataLayer.Repository;
+using SpeakingMania.DataLayer;
 
 namespace SpeakingMania.Models
 {
@@ -16,8 +15,11 @@ namespace SpeakingMania.Models
             {
                 if (_connectionStore == null)
                 {
-                    _connectionStore = ConnectionRepository.Instance.GetAll();
-                    return _connectionStore;
+                    using (var ctx = new SpeakingManiaEntities())
+                    {
+                        _connectionStore = ctx.Connection.ToList();
+                        return _connectionStore;
+                    }
                 }
                 else
                 {
@@ -25,49 +27,50 @@ namespace SpeakingMania.Models
                 }
             }
         } 
-
-        public static bool CheckUserName(string userName)
+        public static void Add(Connection conn)
         {
-            if (                    _connectionStore = ConnectionRepository.Instance.GetAll();
-.Instance.GetUserByName(userName) != null)
-                return true;
-            else
-                return false;
+            using (var ctx = new SpeakingManiaEntities())
+            {
+                Connections.Add(conn);
+                ctx.Connection.Add(conn);
+            }
         }
-        public static void Add(Connection user)
+        public static void Remove(Connection conn)
         {
-            Users.Add(user);
-            UserRepository.Instance.Add(user);
-        }
-        public static void Remove(Connection user)
-        {
-            Users.Remove(user);
-            UserRepository.Instance.Remove(user);
+            using (var ctx = new SpeakingManiaEntities())
+            {
+                Connections.Remove(conn);
+                ctx.Connection.Remove(conn);
+            }
         }
 
-        public static void Update(Connection user)
+        public static void Update(Connection conn)
         {
-            var us = Users.FirstOrDefault(u => u.UserIdentity == user.UserIdentity);
-            us = user;
-            UserRepository.Instance.Update(us);
+            using (var ctx = new SpeakingManiaEntities())
+            {
+                var cn = Connections.FirstOrDefault(c => c.ConnectionId == conn.ConnectionId);
+                cn = conn;
+                ctx.Connection.Attach(conn);
+            }
         }
 
         public static Connection FindById(string identity)
         {
-            var us = Users.FirstOrDefault(u => u.UserIdentity == identity);
-            return us;
+            var cn = Connections.FirstOrDefault(c => c.ConnectionId == identity);
+            return cn;
         }
 
         public static List<Connection> FindByRoomKey(string roomKey)
         {
-            var users = Users.Where(u => u.Room.RoomIdentity == roomKey).ToList();
+            var users = Connections.Where(c => c.Room.RoomIdentity == roomKey).ToList();
             return users.ToList();
         }
 
-        public static Connection FindByName(string userName)
+        public static Connection FindByUserId(int userId)
         {
-            var us = Users.FirstOrDefault(u => u.UserName == userName);
+            var us = Connections.FirstOrDefault(c => c.UserId == userId);
             return us;
         }
     }
+         
 }

@@ -7,7 +7,7 @@ function Login(data) {
         $("#login_modal").modal('hide');
         $("#userName").html(data.name);
         // Имя текущего пользователя
-        options.MyName = data.name;
+        //options.MyName = data.name;
         // Ключ комнаты чата
         options.RoomKey = 'MAIN';
         // Прокси-объект чата
@@ -34,10 +34,14 @@ function Login(data) {
     //});
     //alert("LOGIN");
     $.connection.hub.start(function () {
-        hub.server.login(options.MyName);
+        //hub.server.login(options.MyName);
         hub.server.joinRoom(options.RoomKey);
-        hub.server.updateRooms();
+        //hub.server.updateRooms();
     });
+}
+
+function Register() {
+    alert("registred");
 }
 
 function CreateRoom(data) {

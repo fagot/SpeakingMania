@@ -8,8 +8,7 @@ using System.Web.UI;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
-using SpeakingMania.DataLayer.Models;
-using SpeakingMania.DataLayer.Repository;
+using SpeakingMania.DataLayer;
 
 namespace SpeakingMania.Models
 {
@@ -24,62 +23,55 @@ namespace SpeakingMania.Models
         #endregion
         public override Task OnConnected()
         {
-            var romm = RoomRepository.Instance.GetRoomByRoomKey("MAIN");
-            var user = new User { UserIdentity = Context.ConnectionId, UserName = "", Room = romm };
-            UserStore.Add(user);
+            var romm = RoomStore.FindByKey("MAIN");
+            var conn = new Connection() { ConnectionId = Context.ConnectionId, Room = romm };
+            ConnectionStore.Add(conn);
             return base.OnConnected();
         }
         public override Task OnDisconnected()
         {
-            var us = UserStore.FindById(Context.ConnectionId);
+            var us = ConnectionStore.FindById(Context.ConnectionId);
             if (us != null)
             {
-                UserStore.Remove(us);
+                ConnectionStore.Remove(us);
                 UpdateUsers(us.Room.RoomIdentity);
             }
             return base.OnDisconnected();
         }
-        public void Login(string name)
+        public void Login(UserProfile userProfile)
         {
-            var user = UserStore.FindById(Context.ConnectionId);
-            user.UserName = name;
-            UserStore.Update(user);
+            var conn = ConnectionStore.FindById(Context.ConnectionId);
+            conn.UserProfile = userProfile;
+            ConnectionStore.Update(conn);
         }
         public void JoinRoom(string roomKey)
         {
-            var room = RoomRepository.Instance.GetRoomByRoomKey(roomKey);
-            var user = UserStore.FindById(Context.ConnectionId);
+            var room = RoomStore.FindByKey(roomKey);
+            var conn = ConnectionStore.FindById(Context.ConnectionId);
             Groups.Add(Context.ConnectionId, roomKey);
-            Clients.Client(user.UserIdentity).OnJoinRoom(user.UserIdentity, roomKey);
-            user.Room = room;
-            UserRepository.Instance.Update(user);
+            Clients.Client(conn.ConnectionId).OnJoinRoom(conn.ConnectionId, roomKey);
+            conn.Room = room;
+            ConnectionStore.Update(conn);
             UpdateUsers(room.RoomIdentity);
+            UpdateRooms();
         }
-         public static User AddUser(string userName)
-         {
-             var user = new User {UserName = userName};
-             UserStore.Add(user);
-             return user;
-         }
-       
         public void UpdateUsers(string roomKey)
         {
             var simpleUsers = new List<SimpleUser>();
-            var users = UserStore.FindByRoomKey(roomKey);
+            var users = ConnectionStore.FindByRoomKey(roomKey);
             foreach (var u in users)
             {
-                SimpleUser user;
+                SimpleUser user = new SimpleUser();
                 user.RoomId = u.Room.Id;
-                user.UserName = u.UserName;
-                user.UserIdentity = u.UserIdentity;
+                user.UserIdentity = u.ConnectionId;
                 simpleUsers.Add(user);
             }
 
-            Clients.Group(roomKey).OnUpdateUsers(simpleUsers);
+            Clients.Group(roomKey).OnUpdateUsers(users);
         }
         public void UpdateRooms()
         {
-            var rooms = RoomRepository.Instance.GetAll();
+            var rooms = RoomStore.Rooms.ToList();
             var simpleRooms = new List<SimpleRoom>();
             foreach (var r in rooms)
             {
@@ -88,11 +80,11 @@ namespace SpeakingMania.Models
                 room.RoomName = r.RoomName;
                 simpleRooms.Add(room);
             }
-            Clients.All.OnUpdateRooms(simpleRooms);
+            Clients.All.OnUpdateRooms(rooms);
             
         }
     }
-
+        
     struct SimpleUser
     {
         public string UserName;
