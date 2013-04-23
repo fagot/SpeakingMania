@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using SpeakingMania.DataLayer;
+using SpeakingMania.DAL;
 
 namespace SpeakingMania.Models
 {
     public static class ConnectionStore
     {
+        private static UnitOfWork _unitOfWork;
         private static List<Connection> _connectionStore;
         public static List<Connection> Connections
         {
@@ -15,42 +16,49 @@ namespace SpeakingMania.Models
             {
                 if (_connectionStore == null)
                 {
-                    using (var ctx = new SpeakingManiaEntities())
-                    {
-                        _connectionStore = ctx.Connection.ToList();
-                        return _connectionStore;
-                    }
+                    _connectionStore = _unitOfWork.ConnectionRepository.Get(orderBy: q => q.OrderBy(d => d.Id)).ToList();
+                    return _connectionStore;
+
                 }
                 else
                 {
                     return _connectionStore;
                 }
             }
-        } 
+        }
+        static ConnectionStore()
+        {
+            _unitOfWork = UoFFactory.UnitOfWork;
+        }
+
+        public static UnitOfWork UnitOfWork
+        {
+            get { return _unitOfWork; }
+        }
+
         public static void Add(Connection conn)
         {
-            using (var ctx = new SpeakingManiaEntities())
-            {
-                Connections.Add(conn);
-                ctx.Connection.Add(conn);
-            }
+            Connections.Add(conn);
+            _unitOfWork.ConnectionRepository.Insert(conn);
+            _unitOfWork.Save();
         }
         public static void Remove(Connection conn)
         {
-            using (var ctx = new SpeakingManiaEntities())
-            {
-                Connections.Remove(conn);
-                ctx.Connection.Remove(conn);
-            }
+
+               _unitOfWork.ConnectionRepository.Delete(conn);
+               Connections.Remove(conn);
+               _unitOfWork.Save();
+
         }
 
         public static void Update(Connection conn)
         {
-            using (var ctx = new SpeakingManiaEntities())
+            var obj = Connections.First(r => r.Id == conn.Id);
+            if (obj != null)
             {
-                var cn = Connections.FirstOrDefault(c => c.ConnectionId == conn.ConnectionId);
-                cn = conn;
-                ctx.Connection.Attach(conn);
+                obj = conn;
+                _unitOfWork.ConnectionRepository.Update(conn);
+                _unitOfWork.Save();
             }
         }
 
@@ -60,9 +68,9 @@ namespace SpeakingMania.Models
             return cn;
         }
 
-        public static List<Connection> FindByRoomKey(string roomKey)
+        public static List<Connection> FindByRoomId(int roomId)
         {
-            var users = Connections.Where(c => c.Room.RoomIdentity == roomKey).ToList();
+            var users = Connections.Where(c => c.RoomId == roomId).ToList();
             return users.ToList();
         }
 
@@ -72,5 +80,5 @@ namespace SpeakingMania.Models
             return us;
         }
     }
-         
+
 }

@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using SpeakingMania.DataLayer;
+using SpeakingMania.DAL;
 
 namespace SpeakingMania.Models
 {
     public static class RoomStore
     {
-         private static List<Room> _roomStore;
+        private static UnitOfWork _unitOfWork;
+        private static List<Room> _roomStore;
         public static List<Room> Rooms
         {
             get
             {
                 if (_roomStore == null)
                 {
-                    using (var ctx = new SpeakingManiaEntities())
+                    using (var ctx = new SpeakingManiaContext())
                     {
                         _roomStore = ctx.Room.ToList();
                         return _roomStore;
@@ -26,7 +27,11 @@ namespace SpeakingMania.Models
                     return _roomStore;
                 }
             }
-        } 
+        }
+        static RoomStore()
+        {
+            _unitOfWork = UoFFactory.UnitOfWork;
+        }
         public static bool CheckRoomName(string roomName)
         {
             if (Rooms.First(r=>r.RoomName==roomName)!=null)
@@ -36,35 +41,35 @@ namespace SpeakingMania.Models
         }
         public static void Remove(Room room)
         {
-            using (var ctx = new SpeakingManiaEntities())
-            {
                 Rooms.Remove(room);
-                ctx.Room.Remove(room);
-            }
+                _unitOfWork.RoomRepository.Delete(room);  
         }
         
         public static void Update(Room room)
         {
-            using (var ctx = new SpeakingManiaEntities())
+            var obj = Rooms.First(r => r.Id == room.Id);
+            if (obj != null)
             {
-                var rm = Rooms.FirstOrDefault(u => u.RoomIdentity == room.RoomIdentity);
-                rm = room;
-                ctx.Room.Attach(rm);
+                obj = room;
+                _unitOfWork.RoomRepository.Update(room);
+                _unitOfWork.Save();
             }
         }
         public static void Add(Room room)
         {
-            using (var ctx = new SpeakingManiaEntities())
-            {
-                Rooms.Add(room);
-                ctx.Room.Add(room);
-            }
+            Rooms.Add(room);
+            _unitOfWork.RoomRepository.Insert(room);
+            _unitOfWork.Save();
 
         }
-
-        public static Room FindByKey(string identity)
+        public static Room FindByName(string name)
         {
-            var room = Rooms.FirstOrDefault(r => r.RoomIdentity == identity);
+            var room = Rooms.FirstOrDefault(r => r.RoomName == name);
+            return room;
+        }
+        public static Room FindById(int id)
+        {
+            var room = Rooms.FirstOrDefault(r => r.Id == id);
             return room;
         }
     }

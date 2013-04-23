@@ -46,11 +46,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Afterthought">
+      <HintPath>packages\EntityFramework.Patterns.0.7\lib\net40\Afterthought.dll</HintPath>
+    </Reference>
     <Reference Include="Antlr3.Runtime">
       <HintPath>packages\WebGrease.1.1.0\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework">
       <HintPath>packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.Patterns">
+      <HintPath>packages\EntityFramework.Patterns.0.7\lib\net40\EntityFramework.Patterns.dll</HintPath>
     </Reference>
     <Reference Include="Iesi.Collections">
       <HintPath>packages\Iesi.Collections.3.2.0.4000\lib\Net35\Iesi.Collections.dll</HintPath>
@@ -79,9 +85,6 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NHibernate">
-      <HintPath>packages\NHibernate.3.3.2.4000\lib\Net35\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="Owin">
       <HintPath>packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -120,28 +123,31 @@
   <ItemGroup>
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="DataLayer\Connection.cs">
+    <Compile Include="DAL\Connection.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="DataLayer\DBModel.Context.cs">
+    <Compile Include="DAL\DBModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>DBModel.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="DataLayer\DBModel.cs">
+    <Compile Include="DAL\DBModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="DataLayer\DBModel.Designer.cs">
+    <Compile Include="DAL\DBModel.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>DBModel.edmx</DependentUpon>
     </Compile>
-    <Compile Include="DataLayer\Room.cs">
+    <Compile Include="DAL\GenericRepository.cs" />
+    <Compile Include="DAL\Room.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="DataLayer\UserProfile.cs">
+    <Compile Include="DAL\UnitOfWork.cs" />
+    <Compile Include="DAL\UoFFactory.cs" />
+    <Compile Include="DAL\UserProfile.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
@@ -212,19 +218,19 @@
     <Content Include="Content\font\fontawesome-webfont.ttf" />
     <Content Include="Content\font\fontawesome-webfont.eot" />
     <Content Include="Content\font\FontAwesome.otf" />
-    <EntityDeploy Include="DataLayer\DBModel.edmx">
+    <EntityDeploy Include="DAL\DBModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>DBModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <Content Include="DataLayer\DBModel.Context.tt">
+    <Content Include="DAL\DBModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>DBModel.edmx</DependentUpon>
       <LastGenOutput>DBModel.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="DataLayer\DBModel.edmx.diagram">
+    <Content Include="DAL\DBModel.edmx.diagram">
       <DependentUpon>DBModel.edmx</DependentUpon>
     </Content>
-    <Content Include="DataLayer\DBModel.tt">
+    <Content Include="DAL\DBModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>DBModel.edmx</DependentUpon>
       <LastGenOutput>DBModel.cs</LastGenOutput>
@@ -320,4 +326,8 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>"$(SolutionDir)packages\EntityFramework.Patterns.0.7\tools\Afterthought.Amender.exe" "$(TargetPath)" "$(TargetDir)EntityFramework.Patterns.dll"
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>

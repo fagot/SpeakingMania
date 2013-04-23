@@ -9,7 +9,7 @@ function Login(data) {
         // Имя текущего пользователя
         //options.MyName = data.name;
         // Ключ комнаты чата
-        options.RoomKey = 'MAIN';
+        options.roomId = 1;
         // Прокси-объект чата
         hub = $.connection.userHub;
         hub.client.OnJoinRoom = OnJoinRoom;
@@ -35,7 +35,7 @@ function Login(data) {
     //alert("LOGIN");
     $.connection.hub.start(function () {
         //hub.server.login(options.MyName);
-        hub.server.joinRoom(options.RoomKey);
+        hub.server.joinRoom(options.roomId);
         //hub.server.updateRooms();
     });
 }
@@ -51,16 +51,16 @@ function CreateRoom(data) {
         hub = $.connection.userHub;
         hub.client.OnUpdateRooms = OnUpdateRooms;
         options.roomName = data.roomName;
-        options.roomKey = data.roomKey;
+        options.roomId = data.roomId;
         options.userId = data.userId;
         isRoomOwner = data.isRoomOwner;
         $("#new_room_modal").modal('hide');
-        hub.server.joinRoom(options.roomKey);
+        hub.server.joinRoom(options.roomId);
         hub.server.updateRooms();
         if (isRoomOwner) {
             //document.location = 'Home/Room';
         }
-        
+
     }
     else {
         $("#roomForm").addClass("error");
@@ -102,19 +102,26 @@ function LogIn() {
 }
 /* Login dialod navigation end*/
 
-function OnJoinRoom(userId, roomKey) {
+function OnJoinRoom(userId, roomId) {
     //alert(roomKey);
     //$.post("Home/SaveUserData", { userId: key }, function (data) {
     //    //do whatever with the response
 
     //});
-    if (roomKey != 'MAIN') {
-        $("#roomsBlock").addClass('hidden');
-        $("#privateBlock").removeClass('hidden');
-    } else {
-        $("#roomsBlock").removeClass('hidden');
-        $("#privateBlock").addClass('hidden');
-    }
+    //if (roomKey != 'MAIN') {
+    //    $("#roomsBlock").addClass('hidden');
+    //    $("#privateBlock").removeClass('hidden');
+    //} else {
+    //    $("#roomsBlock").removeClass('hidden');
+    //    $("#privateBlock").addClass('hidden');
+    //}
+    //$.post(
+    //"/Home/SaveUserData",
+    //{
+    //    UserId: userId
+    //},
+    //alert("succes")
+    //);
     $("input[name='userId']").each(function (k, v) {
         $(v).val(userId);
     });
@@ -123,15 +130,15 @@ function OnJoinRoom(userId, roomKey) {
 }
 
 function OnUpdateUsers(data) {
-    
+
     var usersList = $("#users"),
             newList = "";
-    for (var i = 0; i < data.length; i++) { 
+    for (var i = 0; i < data.length; i++) {
         var user = data[i];
         newList += '<li data-key="' + user.UserIdentity + '"><i class="icon-user" style="color:#40FF00"></i>' + user.UserName + '</li>';
-        
+
     }
-   //alert(usersList);
+    //alert(usersList);
     usersList.html(newList);
 }
 
@@ -139,7 +146,7 @@ function OnCreateRoom() {
     alert("room create");
 }
 function OnUpdateRooms(data) {
-    
+
     var roomsList = $("#rooms"),
            newList = "";
     for (var i = 0; i < data.length; i++) {
@@ -148,7 +155,7 @@ function OnUpdateRooms(data) {
 
     }
     roomsList.html(newList);
-    
+
 }
 
 function SelectUser() {

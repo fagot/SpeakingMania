@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="a615d134eb394142b85230681d46f948" Name="Diagram1">
+        <EntityTypeShape EntityType="SpeakingManiaModel.Connection" Width="1.5" PointX="5.25" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SpeakingManiaModel.Room" Width="1.5" PointX="0.75" PointY="2.5" IsExpanded="true" />
+        <AssociationConnector Association="SpeakingManiaModel.FK_Connections_Rooms" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="SpeakingManiaModel.UserProfile" Width="1.5" PointX="9.75" PointY="2.625" />
+        <AssociationConnector Association="SpeakingManiaModel.FK_Connections_UserProfiles" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

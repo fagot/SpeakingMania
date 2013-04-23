@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
-using SpeakingMania.DataLayer;
+using SpeakingMania.DAL;
 using System;
 using SpeakingMania.Models;
 
@@ -16,19 +17,13 @@ namespace SpeakingMania.Controllers
         private string _userId;  
         public ActionResult Index()
         {
-            var cook = Request.Cookies["mylogin"];
-            var keyCook = Request.Cookies["mykey"];
-            
-            if (cook != null && keyCook != null && !String.IsNullOrEmpty(keyCook.Value))
+            var loginCook = Request.Cookies["login"];
+            var keyCook = Request.Cookies["identity"];
+
+            if (loginCook != null && keyCook != null && !String.IsNullOrEmpty(keyCook.Value))
             {
-                ViewBag.Login = HttpUtility.UrlDecode(cook.Value);
+                ViewBag.Login = HttpUtility.UrlDecode(loginCook.Value);
                 ViewBag.MyKey = keyCook.Value;
-                //if (_userId == null)
-                    //var user = UserRepository.Instance.GetUserByIdentity(_userId);
-                    //if (user.Room.RoomName!="MAIN")
-                    //{
-                    //    return Room();
-                    //}
             }
             
 
@@ -137,18 +132,17 @@ namespace SpeakingMania.Controllers
             //return View("Index");
         }
         [HttpPost]
-        public ActionResult Register(string inputEmail, string inputLoginRegister, string inputPasswordRegister)
+        public ActionResult Register(string inputEmail, string inputLoginRegister, string inputPasswordRegister, string userId)
         {
-            var keyCook = Request.Cookies["mykey"];
-            string key = "";
-            if (keyCook != null)
-                key = keyCook.Value;
-            var newUser = new UserProfile { Password = inputPasswordRegister, UserIdentity = key, UserName = inputLoginRegister };
-            using (var ctx = new SpeakingManiaEntities())
-            {
-                ctx.UserProfile.Add(newUser);
-                ctx.SaveChanges();
-            }
+            var conn = ConnectionStore.FindById(userId);
+            var unit = UoFFactory.UnitOfWork;
+            var newUser = new UserProfile { Password = inputPasswordRegister, UserIdentity = Guid.NewGuid().ToString("N"), UserName = inputLoginRegister, Connection = new List<Connection>()};
+            newUser.Connection.Add(conn);
+            unit.UserProfileRepository.Insert(newUser);
+            unit.Save();
+            
+            Response.Cookies.Add(new HttpCookie("login", newUser.UserName));
+            Response.Cookies.Add(new HttpCookie("identity", newUser.UserIdentity));
             return RedirectToAction("Index");
         }
     }

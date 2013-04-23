@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="SpeakingManiaModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="SpeakingManiaModelStoreContainer">
+          <EntitySet Name="Connection" EntityType="SpeakingManiaModel.Store.Connection" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Room" EntityType="SpeakingManiaModel.Store.Room" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="UserProfile" EntityType="SpeakingManiaModel.Store.UserProfile" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_Connections_Rooms" Association="SpeakingManiaModel.Store.FK_Connections_Rooms">
+            <End Role="Room" EntitySet="Room" />
+            <End Role="Connection" EntitySet="Connection" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Connections_UserProfiles" Association="SpeakingManiaModel.Store.FK_Connections_UserProfiles">
+            <End Role="UserProfile" EntitySet="UserProfile" />
+            <End Role="Connection" EntitySet="Connection" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Connection">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="ConnectionId" Type="varchar" Nullable="false" MaxLength="50" />
+          <Property Name="UserId" Type="int" />
+          <Property Name="RoomId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Room">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="RoomIdentity" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="RoomName" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="RoomOwnerId" Type="int" />
+        </EntityType>
+        <EntityType Name="UserProfile">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="UserName" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="UserIdentity" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="Password" Type="varchar" Nullable="false" MaxLength="100" />
+        </EntityType>
+        <Association Name="FK_Connections_Rooms">
+          <End Role="Room" Type="SpeakingManiaModel.Store.Room" Multiplicity="1" />
+          <End Role="Connection" Type="SpeakingManiaModel.Store.Connection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Room">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Connection">
+              <PropertyRef Name="RoomId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Connections_UserProfiles">
+          <End Role="UserProfile" Type="SpeakingManiaModel.Store.UserProfile" Multiplicity="0..1" />
+          <End Role="Connection" Type="SpeakingManiaModel.Store.Connection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Connection">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SpeakingManiaModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="SpeakingManiaEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Connection" EntityType="SpeakingManiaModel.Connection" />
+          <EntitySet Name="Room" EntityType="SpeakingManiaModel.Room" />
+          <AssociationSet Name="FK_Connections_Rooms" Association="SpeakingManiaModel.FK_Connections_Rooms">
+            <End Role="Room" EntitySet="Room" />
+            <End Role="Connection" EntitySet="Connection" />
+          </AssociationSet>
+          <EntitySet Name="UserProfile" EntityType="SpeakingManiaModel.UserProfile" />
+          <AssociationSet Name="FK_Connections_UserProfiles" Association="SpeakingManiaModel.FK_Connections_UserProfiles">
+            <End Role="UserProfile" EntitySet="UserProfile" />
+            <End Role="Connection" EntitySet="Connection" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="Connection">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConnectionId" Type="String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" />
+          <Property Name="UserId" Type="Int32" />
+          <Property Name="RoomId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Room" Relationship="SpeakingManiaModel.FK_Connections_Rooms" FromRole="Connection" ToRole="Room" />
+          <NavigationProperty Name="UserProfile" Relationship="SpeakingManiaModel.FK_Connections_UserProfiles" FromRole="Connection" ToRole="UserProfile" />
+        </EntityType>
+        <EntityType Name="Room">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RoomIdentity" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="RoomName" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
+          <Property Name="RoomOwnerId" Type="Int32" />
+          <NavigationProperty Name="Connection" Relationship="SpeakingManiaModel.FK_Connections_Rooms" FromRole="Room" ToRole="Connection" />
+        </EntityType>
+        <Association Name="FK_Connections_Rooms">
+          <End Role="Room" Type="SpeakingManiaModel.Room" Multiplicity="1" />
+          <End Role="Connection" Type="SpeakingManiaModel.Connection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Room">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Connection">
+              <PropertyRef Name="RoomId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="UserProfile">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="UserName" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="UserIdentity" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Password" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Connection" Relationship="SpeakingManiaModel.FK_Connections_UserProfiles" FromRole="UserProfile" ToRole="Connection" />
+        </EntityType>
+        <Association Name="FK_Connections_UserProfiles">
+          <End Type="SpeakingManiaModel.UserProfile" Role="UserProfile" Multiplicity="0..1" />
+          <End Type="SpeakingManiaModel.Connection" Role="Connection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserProfile">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Connection">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="SpeakingManiaModelStoreContainer" CdmEntityContainer="SpeakingManiaEntities">
+          <EntitySetMapping Name="Connection">
+            <EntityTypeMapping TypeName="SpeakingManiaModel.Connection">
+              <MappingFragment StoreEntitySet="Connection">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ConnectionId" ColumnName="ConnectionId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="RoomId" ColumnName="RoomId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Room">
+            <EntityTypeMapping TypeName="SpeakingManiaModel.Room">
+              <MappingFragment StoreEntitySet="Room">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="RoomIdentity" ColumnName="RoomIdentity" />
+                <ScalarProperty Name="RoomName" ColumnName="RoomName" />
+                <ScalarProperty Name="RoomOwnerId" ColumnName="RoomOwnerId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserProfile">
+            <EntityTypeMapping TypeName="SpeakingManiaModel.UserProfile">
+              <MappingFragment StoreEntitySet="UserProfile">
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="UserIdentity" ColumnName="UserIdentity" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
