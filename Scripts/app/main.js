@@ -6,16 +6,18 @@ function Login(data) {
     if (data.success) {
         $("#login_modal").modal('hide');
         $("#userName").html(data.name);
-        // Имя текущего пользователя
-        //options.MyName = data.name;
-        // Ключ комнаты чата
         options.roomId = "MAIN";
         // Прокси-объект чата
+
         hub = $.connection.userHub;
         hub.client.OnJoinRoom = OnJoinRoom;
         hub.client.OnUpdateUsers = OnUpdateUsers;
         hub.client.OnUpdateRooms = OnUpdateRooms;
-
+        $.connection.hub.start(function () {
+            //hub.server.login(options.MyName);
+            hub.server.joinRoom(options.roomId);
+            //hub.server.updateRooms();
+        });
 
     } else {
         $("#login").addClass("error");
@@ -25,19 +27,8 @@ function Login(data) {
     $('#users').delegate('li', 'click', SelectUser);
     $('#rooms').delegate('tr', 'click', SelectRoom);
 
-    //$("#msg").keydown(function (e) {
-    //    if (e.keyCode == 13 && !e.shiftKey) {
-    //        Send();
-    //        return false;
-    //    }
-    //    return true;
-    //});
-    //alert("LOGIN");
-    $.connection.hub.start(function () {
-        //hub.server.login(options.MyName);
-        hub.server.joinRoom(options.roomId);
-        //hub.server.updateRooms();
-    }); 
+
+
 }
 
 function Register() {

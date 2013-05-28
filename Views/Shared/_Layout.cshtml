@@ -12,7 +12,7 @@
     @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
     @Scripts.Render("~/Scripts/jquery.signalR-1.0.1.min.js")
     <script src="/signalr/hubs"></script>
-   
+    @RenderSection("scripts", required: false)
     <style type="text/css">
         body {
             padding-top: 60px;
@@ -43,6 +43,6 @@
     </div> <!-- /container --> 
     
     @*    <script src="~signalr/hubs" type="text/javascript"></script>*@
-     @RenderSection("scripts", required: false)
+    
 </body>
 </html>

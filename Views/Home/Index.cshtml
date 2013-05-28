@@ -1,6 +1,17 @@
 @{  
     ViewBag.Title = "Home Page";
 }
+@section scripts
+{    
+    @Scripts.Render("~/Scripts/app/main.js")
+    
+    <script type="text/javascript">
+        $(function() {
+            Login({ success: true });
+        });
+    </script>
+
+}
 <div class="row well">
     <h4>@ViewBag.Message</h4>
     <span>Logined as: </span>
@@ -150,16 +161,4 @@
     <div class="modal-footer">
     </div>
 </div>
-@section scripts
-{    
-    @Scripts.Render("~/Scripts/app/main.js")
 
-    @if (ViewBag.Login != null && !String.IsNullOrEmpty(ViewBag.MyKey.ToString()))
-    {
-        <script type="text/javascript"> Login({ success: true }); </script>
-    }
-    else
-    {
-        <script type="text/javascript">Login({ success: true }); SetNameDialog(); </script>
-    }
-}

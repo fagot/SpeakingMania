@@ -21,58 +21,68 @@ namespace SpeakingMania.Models
         }
 
         #endregion
+        private string GetClientId()
+        {
+            string clientId = "";
+            if (!(Context.QueryString["clientId"] == null))
+            {
+                //clientId passed from application
+                clientId = Context.QueryString["clientId"].ToString();
+            }
+
+            if (clientId.Trim() == "")
+            {
+                //default clientId: connectionId
+                clientId = Context.ConnectionId;
+            }
+            return clientId;
+
+        }
         public override Task OnConnected()
         {
-            var cc = Context.RequestCookies.FirstOrDefault(c=>c.Value.ToString()=="connection");
-            if (cc.Value == null)
-            {
-                Context.RequestCookies.Add("connection", new Cookie("connection", Context.ConnectionId));
-            }
-            else
-            {
-                var us = ConnectionStore.FindById(cc.Value.ToString());
-                if (us != null)
-                {
-                    ConnectionStore.Remove(us);
-                } 
-            }
+
+            var clientId = GetClientId();
             var romm = RoomStore.FindByName("MAIN");
-            var conn = new Connection() { ConnectionId = Context.ConnectionId, RoomId = romm.Id, Room = romm };
-            ConnectionStore.Add(conn);
-            //CheckList();
+            var us = ConnectionStore.FindById(clientId);
+            if (us == null)
+            {
+                var conn = new Connection() {ConnectionId = clientId, RoomId = romm.Id, Room = romm};
+                ConnectionStore.Add(conn);
+                //UpdateUsers(romm.Id.ToString());
+            }
             return base.OnConnected();
+        }
+        public override Task OnReconnected()
+        {
+            var clientId = GetClientId();
+            var room = RoomStore.FindByName("MAIN");
+            var us = ConnectionStore.FindById(clientId);
+            if (us == null)
+            {
+                var conn = new Connection() { ConnectionId = clientId, RoomId = room.Id, Room = room };
+                ConnectionStore.Add(conn);
+                UpdateUsers(room.RoomIdentity);
+            }
+            return base.OnReconnected();
         }
         public override Task OnDisconnected()
         {
-            var us = ConnectionStore.FindById(Context.ConnectionId);
+            var clientId = GetClientId();
+            var us = ConnectionStore.FindById(clientId);
             if (us != null)
             {
-                var roomId = us.RoomId;
+                var room = us.Room;
                 ConnectionStore.Remove(us);
-                UpdateUsers(roomId.ToString());
+                UpdateUsers(room.RoomIdentity);
             }
             return base.OnDisconnected();
         }
-        private void CheckList()
-        {
-            foreach (var connection in ConnectionStore.Connections)
-            {
-                if (Clients.All[connection.ConnectionId] == null)
-                {
-                    ConnectionStore.Remove(connection);
-                }
-            }
-        }
-        public void Login(UserProfile userProfile)
-        {
-            var conn = ConnectionStore.FindById(Context.ConnectionId);
-            conn.UserId = userProfile.Id;
-            ConnectionStore.Update(conn);
-        }
+        
         public void JoinRoom(string roomKey)
         {
+            var clientId = GetClientId(); 
             var room = RoomStore.FindByKey(roomKey);
-            var conn = ConnectionStore.FindById(Context.ConnectionId);
+            var conn = ConnectionStore.FindById(clientId);
             Groups.Add(Context.ConnectionId, roomKey);
             Clients.Client(conn.ConnectionId).OnJoinRoom(conn.ConnectionId, roomKey);
             conn.RoomId = room.Id;

@@ -16,7 +16,8 @@ namespace SpeakingMania.Models
             {
                 if (_connectionStore == null)
                 {
-                    _connectionStore = _unitOfWork.ConnectionRepository.Get(orderBy: q => q.OrderBy(d => d.Id)).ToList();
+                    //_connectionStore = _unitOfWork.ConnectionRepository.Get(orderBy: q => q.OrderBy(d => d.Id)).ToList();
+                    _connectionStore = new List<Connection>();
                     return _connectionStore;
 
                 }
