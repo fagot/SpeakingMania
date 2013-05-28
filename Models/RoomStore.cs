@@ -72,5 +72,10 @@ namespace SpeakingMania.Models
             var room = Rooms.FirstOrDefault(r => r.Id == id);
             return room;
         }
+        public static Room FindByKey(string key)
+        {
+            var room = Rooms.FirstOrDefault(r => r.RoomIdentity == key);
+            return room;
+        }
     }
 }

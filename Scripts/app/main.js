@@ -9,7 +9,7 @@ function Login(data) {
         // Имя текущего пользователя
         //options.MyName = data.name;
         // Ключ комнаты чата
-        options.roomId = 1;
+        options.roomId = "MAIN";
         // Прокси-объект чата
         hub = $.connection.userHub;
         hub.client.OnJoinRoom = OnJoinRoom;
@@ -37,7 +37,7 @@ function Login(data) {
         //hub.server.login(options.MyName);
         hub.server.joinRoom(options.roomId);
         //hub.server.updateRooms();
-    });
+    }); 
 }
 
 function Register() {
@@ -103,7 +103,7 @@ function LogIn() {
 /* Login dialod navigation end*/
 
 function OnJoinRoom(userId, roomId) {
-    //alert(roomKey);
+   // alert(roomId);
     //$.post("Home/SaveUserData", { userId: key }, function (data) {
     //    //do whatever with the response
 
@@ -130,7 +130,7 @@ function OnJoinRoom(userId, roomId) {
 }
 
 function OnUpdateUsers(data) {
-
+ //alert("DFS");
     var usersList = $("#users"),
             newList = "";
     for (var i = 0; i < data.length; i++) {
@@ -138,7 +138,7 @@ function OnUpdateUsers(data) {
         newList += '<li data-key="' + user.UserIdentity + '"><i class="icon-user" style="color:#40FF00"></i>' + user.UserName + '</li>';
 
     }
-    //alert(usersList);
+   
     usersList.html(newList);
 }
 
@@ -159,7 +159,8 @@ function OnUpdateRooms(data) {
 }
 
 function SelectUser() {
-    alert("user clicked");
+    var userId = $(this).attr("data-key");
+    alert(userId);
 }
 function SelectRoom() {
     $("#lbl_roomName").text($(this).children("td").eq(1).html());

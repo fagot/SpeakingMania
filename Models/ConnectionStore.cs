@@ -39,15 +39,15 @@ namespace SpeakingMania.Models
         public static void Add(Connection conn)
         {
             Connections.Add(conn);
-            _unitOfWork.ConnectionRepository.Insert(conn);
-            _unitOfWork.Save();
+           // _unitOfWork.ConnectionRepository.Insert(conn);
+            //_unitOfWork.Save();
         }
         public static void Remove(Connection conn)
         {
 
-               _unitOfWork.ConnectionRepository.Delete(conn);
+               //_unitOfWork.ConnectionRepository.Delete(conn);
                Connections.Remove(conn);
-               _unitOfWork.Save();
+              // _unitOfWork.Save();
 
         }
 
@@ -57,8 +57,8 @@ namespace SpeakingMania.Models
             if (obj != null)
             {
                 obj = conn;
-                _unitOfWork.ConnectionRepository.Update(conn);
-                _unitOfWork.Save();
+                //_unitOfWork.ConnectionRepository.Update(conn);
+                //_unitOfWork.Save();
             }
         }
 
@@ -73,7 +73,11 @@ namespace SpeakingMania.Models
             var users = Connections.Where(c => c.RoomId == roomId).ToList();
             return users.ToList();
         }
-
+        public static List<Connection> FindByRoomKey(string roomKey)
+        {
+            var users = Connections.Where(c => c.Room.RoomIdentity == roomKey).ToList();
+            return users.ToList();
+        }
         public static Connection FindByUserId(int userId)
         {
             var us = Connections.FirstOrDefault(c => c.UserId == userId);
