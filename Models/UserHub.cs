@@ -24,10 +24,10 @@ namespace SpeakingMania.Models
         private string GetClientId()
         {
             string clientId = "";
-            if (!(Context.QueryString["clientId"] == null))
+            if (!String.IsNullOrEmpty(Context.QueryString["clientId"]))
             {
                 //clientId passed from application
-                clientId = Context.QueryString["clientId"].ToString();
+                clientId = Context.QueryString["clientId"];
             }
 
             if (clientId.Trim() == "")
@@ -40,23 +40,26 @@ namespace SpeakingMania.Models
         }
         public override Task OnConnected()
         {
-
-            var clientId = GetClientId();
-            var romm = RoomStore.FindByName("MAIN");
-            var us = ConnectionStore.FindById(clientId);
-            if (us == null)
+            lock (ConnectionStore.Connections)
             {
-                var conn = new Connection() {ConnectionId = clientId, RoomId = romm.Id, Room = romm};
-                ConnectionStore.Add(conn);
-                //UpdateUsers(romm.Id.ToString());
+                var clientId = GetClientId();
+                var romm = RoomStore.FindByName("MAIN");
+                
+                if (!ConnectionStore.IdentityExists(clientId))
+                {
+                    var us = ConnectionStore.GetById(clientId);
+                    var conn = new Connection() {ConnectionId = clientId, RoomId = romm.Id, Room = romm};
+                    ConnectionStore.Add(conn);
+                    //UpdateUsers(romm.Id.ToString());
+                }
+                return base.OnConnected();
             }
-            return base.OnConnected();
         }
         public override Task OnReconnected()
         {
             var clientId = GetClientId();
             var room = RoomStore.FindByName("MAIN");
-            var us = ConnectionStore.FindById(clientId);
+            var us = ConnectionStore.GetById(clientId);
             if (us == null)
             {
                 var conn = new Connection() { ConnectionId = clientId, RoomId = room.Id, Room = room };
@@ -68,9 +71,10 @@ namespace SpeakingMania.Models
         public override Task OnDisconnected()
         {
             var clientId = GetClientId();
-            var us = ConnectionStore.FindById(clientId);
-            if (us != null)
+
+            if (ConnectionStore.IdentityExists(clientId))
             {
+                var us = ConnectionStore.GetById(clientId);
                 var room = us.Room;
                 ConnectionStore.Remove(us);
                 UpdateUsers(room.RoomIdentity);
@@ -80,14 +84,17 @@ namespace SpeakingMania.Models
         
         public void JoinRoom(string roomKey)
         {
-            var clientId = GetClientId(); 
-            var room = RoomStore.FindByKey(roomKey);
-            var conn = ConnectionStore.FindById(clientId);
-            Groups.Add(Context.ConnectionId, roomKey);
-            Clients.Client(conn.ConnectionId).OnJoinRoom(conn.ConnectionId, roomKey);
-            conn.RoomId = room.Id;
-            ConnectionStore.Update(conn);
-            UpdateUsers(room.RoomIdentity);
+            var clientId = GetClientId();
+            if (ConnectionStore.IdentityExists(clientId))
+            {
+                var room = RoomStore.FindByKey(roomKey);
+                var conn = ConnectionStore.GetById(clientId);
+                Groups.Add(Context.ConnectionId, roomKey);
+                Clients.Client(conn.ConnectionId).OnJoinRoom(conn.ConnectionId, roomKey);
+                conn.RoomId = room.Id;
+                ConnectionStore.Update(conn);
+                UpdateUsers(room.RoomIdentity);
+            }
             UpdateRooms();
         }
         public void UpdateUsers(string roomKey)

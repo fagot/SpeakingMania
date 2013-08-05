@@ -63,12 +63,16 @@ namespace SpeakingMania.Models
             }
         }
 
-        public static Connection FindById(string identity)
+        public static Connection GetById(string identity)
         {
             var cn = Connections.FirstOrDefault(c => c.ConnectionId == identity);
             return cn;
         }
-
+        public static bool IdentityExists(string identity)
+        {
+            var cn = Connections.Exists(c => c.ConnectionId == identity);
+            return cn;
+        }
         public static List<Connection> FindByRoomId(int roomId)
         {
             var users = Connections.Where(c => c.RoomId == roomId).ToList();

@@ -134,7 +134,7 @@ namespace SpeakingMania.Controllers
         [HttpPost]
         public ActionResult Register(string inputEmail, string inputLoginRegister, string inputPasswordRegister, string userId)
         {
-            var conn = ConnectionStore.FindById(userId);
+            var conn = ConnectionStore.GetById(userId);
             var unit = UoFFactory.UnitOfWork;
             var newUser = new UserProfile { Password = inputPasswordRegister, UserIdentity = Guid.NewGuid().ToString("N"), UserName = inputLoginRegister, Connection = new List<Connection>()};
             newUser.Connection.Add(conn);
