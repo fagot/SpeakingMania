@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
   <!-- EF Runtime content -->
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="SpeakingManiaModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+    <Schema Namespace="SpeakingManiaModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityContainer Name="SpeakingManiaModelStoreContainer">
           <EntitySet Name="Connection" EntityType="SpeakingManiaModel.Store.Connection" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="Room" EntityType="SpeakingManiaModel.Store.Room" store:Type="Tables" Schema="dbo" />
@@ -26,6 +26,7 @@
           <Property Name="ConnectionId" Type="varchar" Nullable="false" MaxLength="50" />
           <Property Name="UserId" Type="int" />
           <Property Name="RoomId" Type="int" Nullable="false" />
+          <Property Name="Connected" Type="bit" />
         </EntityType>
         <EntityType Name="Room">
           <Key>
@@ -72,8 +73,8 @@
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="SpeakingManiaModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
-        <EntityContainer Name="SpeakingManiaEntities" annotation:LazyLoadingEnabled="true">
+      <Schema Namespace="SpeakingManiaModel" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="SpeakingManiaEntities" annotation:LazyLoadingEnabled="true" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
           <EntitySet Name="Connection" EntityType="SpeakingManiaModel.Connection" />
           <EntitySet Name="Room" EntityType="SpeakingManiaModel.Room" />
           <AssociationSet Name="FK_Connections_Rooms" Association="SpeakingManiaModel.FK_Connections_Rooms">
@@ -90,18 +91,19 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Name="ConnectionId" Type="String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" />
           <Property Name="UserId" Type="Int32" />
           <Property Name="RoomId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Room" Relationship="SpeakingManiaModel.FK_Connections_Rooms" FromRole="Connection" ToRole="Room" />
           <NavigationProperty Name="UserProfile" Relationship="SpeakingManiaModel.FK_Connections_UserProfiles" FromRole="Connection" ToRole="UserProfile" />
+          <Property Type="Boolean" Name="Connected" />
         </EntityType>
         <EntityType Name="Room">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Name="RoomIdentity" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
           <Property Name="RoomName" Type="String" Nullable="false" MaxLength="100" Unicode="false" FixedLength="false" />
           <Property Name="RoomOwnerId" Type="Int32" />
@@ -123,7 +125,7 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="UserName" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="UserIdentity" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="Password" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
@@ -145,11 +147,12 @@
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="SpeakingManiaModelStoreContainer" CdmEntityContainer="SpeakingManiaEntities">
           <EntitySetMapping Name="Connection">
             <EntityTypeMapping TypeName="SpeakingManiaModel.Connection">
               <MappingFragment StoreEntitySet="Connection">
+                <ScalarProperty Name="Connected" ColumnName="Connected" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ConnectionId" ColumnName="ConnectionId" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
@@ -182,7 +185,7 @@
     </edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
-  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <Connection>
       <DesignerInfoPropertySet>
         <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
@@ -197,6 +200,6 @@
       </DesignerInfoPropertySet>
     </Options>
     <!-- Diagram content (shape and connector positions) -->
-    <Diagrams></Diagrams>
+    <Diagrams />
   </Designer>
 </edmx:Edmx>

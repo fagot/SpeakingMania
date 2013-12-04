@@ -28,7 +28,6 @@ namespace SpeakingMania
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
-            RouteTable.Routes.MapHubs();
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
             

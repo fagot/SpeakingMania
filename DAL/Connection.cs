@@ -18,6 +18,7 @@ namespace SpeakingMania.DAL
         public string ConnectionId { get; set; }
         public Nullable<int> UserId { get; set; }
         public int RoomId { get; set; }
+        public Nullable<bool> Connected { get; set; }
     
         public virtual Room Room { get; set; }
         public virtual UserProfile UserProfile { get; set; }

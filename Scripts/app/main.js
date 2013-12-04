@@ -10,12 +10,12 @@ function Login(data) {
         // Прокси-объект чата
 
         hub = $.connection.userHub;
-        hub.client.OnJoinRoom = OnJoinRoom;
+        hub.client.joined = OnJoinRoom;
         hub.client.OnUpdateUsers = OnUpdateUsers;
         hub.client.OnUpdateRooms = OnUpdateRooms;
         $.connection.hub.start(function () {
             //hub.server.login(options.MyName);
-            hub.server.joinRoom(options.roomId);
+            //hub.server.joinRoom(options.roomId);
             //hub.server.updateRooms();
         });
 
@@ -113,6 +113,7 @@ function OnJoinRoom(userId, roomId) {
     //},
     //alert("succes")
     //);
+    alert("A");
     $("input[name='userId']").each(function (k, v) {
         $(v).val(userId);
     });
@@ -121,7 +122,7 @@ function OnJoinRoom(userId, roomId) {
 }
 
 function OnUpdateUsers(data) {
- //alert("DFS");
+ alert("DFS");
     var usersList = $("#users"),
             newList = "";
     for (var i = 0; i < data.length; i++) {

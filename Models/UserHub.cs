@@ -40,24 +40,42 @@ namespace SpeakingMania.Models
         }
         public override Task OnConnected()
         {
-            lock (ConnectionStore.Connections)
+            var name = "bell";
+            using (var db = new SpeakingManiaContext())
             {
-                var clientId = GetClientId();
-                var romm = RoomStore.FindByName("MAIN");
-                
-                if (!ConnectionStore.IdentityExists(clientId))
+                var defaultRoom = db.Room.SingleOrDefault(s => s.RoomName == "MAIN");
+                var user = db.UserProfile
+                    //.Include(u => u.Connection)
+                    .SingleOrDefault(u => u.UserName == name);
+
+                if (user == null)
                 {
-                    var us = ConnectionStore.GetById(clientId);
-                    var conn = new Connection() {ConnectionId = clientId, RoomId = romm.Id, Room = romm};
-                    ConnectionStore.Add(conn);
-                    //UpdateUsers(romm.Id.ToString());
+                    user = new UserProfile
+                    {
+                        UserName = name,
+                        Connection = new List<Connection>(),
+                        Password = "ZA",
+                        UserIdentity = "ASAS"
+                    };
+                    db.UserProfile.Add(user);
                 }
-                return base.OnConnected();
+
+                user.Connection.Add(new Connection
+                {
+                    ConnectionId = Context.ConnectionId,
+                    Connected = true,
+                    Room = defaultRoom,
+                    RoomId = defaultRoom.Id
+                });
+                db.SaveChanges();
+                UpdateUsers("MAIN");
             }
+            return base.OnConnected();
         }
         public override Task OnReconnected()
         {
             var clientId = GetClientId();
+            return Clients.All.rejoined(Context.ConnectionId, DateTime.Now.ToString());
             var room = RoomStore.FindByName("MAIN");
             var us = ConnectionStore.GetById(clientId);
             if (us == null)
@@ -70,15 +88,13 @@ namespace SpeakingMania.Models
         }
         public override Task OnDisconnected()
         {
-            var clientId = GetClientId();
-
-            if (ConnectionStore.IdentityExists(clientId))
+            using (var db = new SpeakingManiaContext())
             {
-                var us = ConnectionStore.GetById(clientId);
-                var room = us.Room;
-                ConnectionStore.Remove(us);
-                UpdateUsers(room.RoomIdentity);
+                var connection = db.Connection.FirstOrDefault(s=>s.ConnectionId == Context.ConnectionId);
+                connection.Connected = false;
+                db.SaveChanges();
             }
+            UpdateUsers("MAIN");
             return base.OnDisconnected();
         }
         
@@ -100,15 +116,21 @@ namespace SpeakingMania.Models
         public void UpdateUsers(string roomKey)
         {
             var simpleUsers = new List<SimpleUser>();
-            var users = ConnectionStore.FindByRoomKey(roomKey);
-            foreach (var u in users)
+            using (var db = new SpeakingManiaContext())
             {
-                SimpleUser user = new SimpleUser();
-                user.RoomId = u.RoomId;
-                user.UserIdentity = u.ConnectionId;
-                simpleUsers.Add(user);
-            }
+                var room =
+                    db.Room.FirstOrDefault(s => s.RoomIdentity == roomKey);
+                var users = db.UserProfile.Where(u => u.Connection.Any(c => c.Connected == true && c.RoomId == room.Id) == true);
 
+                foreach (var u in users)
+                {
+                    SimpleUser user = new SimpleUser();
+                    user.RoomId = room.Id;
+                    user.UserIdentity = u.UserIdentity;
+                    user.UserName = u.UserName;
+                    simpleUsers.Add(user);
+                }
+            }
             Clients.All.OnUpdateUsers(simpleUsers);
             
         }
