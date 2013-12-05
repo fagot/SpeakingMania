@@ -40,19 +40,27 @@ namespace SpeakingMania.Models
         }
         public override Task OnConnected()
         {
-            var name = "bell";
+            string username = "";
+            if (Context.Request.Cookies.ContainsKey("username"))
+            {
+                username = Context.Request.Cookies["username"].Value;
+            }
+            else
+            {
+                username = "anonymous";
+            }
             using (var db = new SpeakingManiaContext())
             {
                 var defaultRoom = db.Room.SingleOrDefault(s => s.RoomName == "MAIN");
                 var user = db.UserProfile
                     //.Include(u => u.Connection)
-                    .SingleOrDefault(u => u.UserName == name);
+                    .SingleOrDefault(u => u.UserName == username);
 
                 if (user == null)
                 {
                     user = new UserProfile
                     {
-                        UserName = name,
+                        UserName = username,
                         Connection = new List<Connection>(),
                         Password = "ZA",
                         UserIdentity = "ASAS"
@@ -120,7 +128,7 @@ namespace SpeakingMania.Models
             {
                 var room =
                     db.Room.FirstOrDefault(s => s.RoomIdentity == roomKey);
-                var users = db.UserProfile.Where(u => u.Connection.Any(c => c.Connected == true && c.RoomId == room.Id) == true);
+                var users = db.UserProfile.Where(u => u.Connection.Any(c => c.Connected == true && c.RoomId == room.Id));
 
                 foreach (var u in users)
                 {

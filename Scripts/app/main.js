@@ -17,6 +17,7 @@ function Login(data) {
             //hub.server.login(options.MyName);
             //hub.server.joinRoom(options.roomId);
             //hub.server.updateRooms();
+            SetNameDialog();
         });
 
     } else {
@@ -90,6 +91,7 @@ function LogIn() {
     $("#signInForm").hide();
     $("#signUpForm").hide();
     $("#logIn").show();
+   // alert("SAS");
 }
 /* Login dialod navigation end*/
 
@@ -122,7 +124,7 @@ function OnJoinRoom(userId, roomId) {
 }
 
 function OnUpdateUsers(data) {
- alert("DFS");
+ //alert("DFS");
     var usersList = $("#users"),
             newList = "";
     for (var i = 0; i < data.length; i++) {

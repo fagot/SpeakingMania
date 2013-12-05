@@ -110,11 +110,11 @@ namespace SpeakingMania.Controllers
              return View("Room");
          }
         [HttpPost]
-        public ActionResult Login(string login)
+        public ActionResult Login(string inputLogin, string inputPassword)
         {
             var errors = new Dictionary<string, string>();
             
-            if (!String.IsNullOrEmpty(login) && login.Length < 255)
+            if (!String.IsNullOrEmpty(inputLogin) && inputLogin.Length < 255)
             {
                 var keyCook = Request.Cookies["mykey"];
                 if (keyCook == null)
@@ -123,9 +123,9 @@ namespace SpeakingMania.Controllers
                     HttpContext.Response.Cookies.Add(keyCook);
                 }
 
-                var loginCook = new HttpCookie("mylogin", HttpUtility.UrlEncode(login)) { Expires = DateTime.Now.AddDays(1) };
+                var loginCook = new HttpCookie("username", HttpUtility.UrlEncode(inputLogin)) { Expires = DateTime.Now.AddDays(1) };
                 HttpContext.Response.Cookies.Add(loginCook);
-                return Json(new { success = true, name = login, key = keyCook.Value });
+                return Json(new { success = true, name = inputLogin, key = keyCook.Value });
                 //return Index();
             }
             return Json(new { success = false, errors });
