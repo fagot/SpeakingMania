@@ -14,12 +14,15 @@ namespace SpeakingMania.DAL
         internal SpeakingManiaContext context;
         internal DbSet<TEntity> dbSet;
 
+        public GenericRepository()
+        {
+
+        }
         public GenericRepository(SpeakingManiaContext context)
         {
             this.context = context;
             this.dbSet = context.Set<TEntity>();
         }
-
         public virtual IEnumerable<TEntity> Get(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,

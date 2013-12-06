@@ -45,6 +45,7 @@
           <Property Name="UserName" Type="varchar" Nullable="false" MaxLength="100" />
           <Property Name="UserIdentity" Type="varchar" Nullable="false" MaxLength="100" />
           <Property Name="Password" Type="varchar" Nullable="false" MaxLength="100" />
+          <Property Name="Email" Type="varchar" MaxLength="100" />
         </EntityType>
         <Association Name="FK_Connections_Rooms">
           <End Role="Room" Type="SpeakingManiaModel.Store.Room" Multiplicity="1" />
@@ -130,6 +131,7 @@
           <Property Type="String" Name="UserIdentity" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="Password" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Connection" Relationship="SpeakingManiaModel.FK_Connections_UserProfiles" FromRole="UserProfile" ToRole="Connection" />
+          <Property Type="String" Name="Email" />
         </EntityType>
         <Association Name="FK_Connections_UserProfiles">
           <End Type="SpeakingManiaModel.UserProfile" Role="UserProfile" Multiplicity="0..1" />
@@ -173,6 +175,7 @@
           <EntitySetMapping Name="UserProfile">
             <EntityTypeMapping TypeName="SpeakingManiaModel.UserProfile">
               <MappingFragment StoreEntitySet="UserProfile">
+                <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="UserIdentity" ColumnName="UserIdentity" />
                 <ScalarProperty Name="UserName" ColumnName="UserName" />

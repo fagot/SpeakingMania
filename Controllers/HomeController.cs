@@ -113,20 +113,25 @@ namespace SpeakingMania.Controllers
         public ActionResult Login(string inputLogin, string inputPassword)
         {
             var errors = new Dictionary<string, string>();
-            
-            if (!String.IsNullOrEmpty(inputLogin) && inputLogin.Length < 255)
+            var userRepository = new UserRepository();
+            var user = userRepository.GetAuthorizedUser(inputLogin, inputPassword);
+            if (user!=null)
             {
-                var keyCook = Request.Cookies["mykey"];
+                var keyCook = Request.Cookies["SSID"];
                 if (keyCook == null)
                 {
-                    keyCook = new HttpCookie("mykey", Guid.NewGuid().ToString("N"));
+                    keyCook = new HttpCookie("SSID", Session.SessionID) {Expires = DateTime.Now.AddMinutes(30)};
                     HttpContext.Response.Cookies.Add(keyCook);
                 }
 
-                var loginCook = new HttpCookie("username", HttpUtility.UrlEncode(inputLogin)) { Expires = DateTime.Now.AddDays(1) };
+                var loginCook = new HttpCookie("username", HttpUtility.UrlEncode(inputLogin)) { Expires = DateTime.Now.AddMinutes(30) };
                 HttpContext.Response.Cookies.Add(loginCook);
                 return Json(new { success = true, name = inputLogin, key = keyCook.Value });
                 //return Index();
+            }
+            else
+            {
+                errors.Add("Error", "Incorrect login/password");
             }
             return Json(new { success = false, errors });
             //return View("Index");
@@ -134,10 +139,8 @@ namespace SpeakingMania.Controllers
         [HttpPost]
         public ActionResult Register(string inputEmail, string inputLoginRegister, string inputPasswordRegister, string userId)
         {
-            var conn = ConnectionStore.GetById(userId);
             var unit = UoFFactory.UnitOfWork;
             var newUser = new UserProfile { Password = inputPasswordRegister, UserIdentity = Guid.NewGuid().ToString("N"), UserName = inputLoginRegister, Connection = new List<Connection>()};
-            newUser.Connection.Add(conn);
             unit.UserProfileRepository.Insert(newUser);
             unit.Save();
             

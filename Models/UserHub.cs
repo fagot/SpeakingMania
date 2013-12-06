@@ -56,18 +56,6 @@ namespace SpeakingMania.Models
                     //.Include(u => u.Connection)
                     .SingleOrDefault(u => u.UserName == username);
 
-                if (user == null)
-                {
-                    user = new UserProfile
-                    {
-                        UserName = username,
-                        Connection = new List<Connection>(),
-                        Password = "ZA",
-                        UserIdentity = "ASAS"
-                    };
-                    db.UserProfile.Add(user);
-                }
-
                 user.Connection.Add(new Connection
                 {
                     ConnectionId = Context.ConnectionId,
@@ -82,16 +70,16 @@ namespace SpeakingMania.Models
         }
         public override Task OnReconnected()
         {
-            var clientId = GetClientId();
-            return Clients.All.rejoined(Context.ConnectionId, DateTime.Now.ToString());
-            var room = RoomStore.FindByName("MAIN");
-            var us = ConnectionStore.GetById(clientId);
-            if (us == null)
-            {
-                var conn = new Connection() { ConnectionId = clientId, RoomId = room.Id, Room = room };
-                ConnectionStore.Add(conn);
-                UpdateUsers(room.RoomIdentity);
-            }
+            //var clientId = GetClientId();
+            //return Clients.All.rejoined(Context.ConnectionId, DateTime.Now.ToString());
+            //var room = RoomStore.FindByName("MAIN");
+            //var us = ConnectionStore.GetById(clientId);
+            //if (us == null)
+            //{
+            //    var conn = new Connection() { ConnectionId = clientId, RoomId = room.Id, Room = room };
+            //    ConnectionStore.Add(conn);
+            //    UpdateUsers(room.RoomIdentity);
+            //}
             return base.OnReconnected();
         }
         public override Task OnDisconnected()
