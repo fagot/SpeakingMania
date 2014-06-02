@@ -10,14 +10,15 @@ function Login(data) {
         // Прокси-объект чата
 
         hub = $.connection.userHub;
-        hub.client.joined = OnJoinRoom;
-        hub.client.OnUpdateUsers = OnUpdateUsers;
-        hub.client.OnUpdateRooms = OnUpdateRooms;
+        hub.client.JoinRoom = OnJoinRoom;
+        hub.client.UpdateUsers = OnUpdateUsers;
+        hub.client.UpdateRooms = OnUpdateRooms;
+        hub.client.SetUsername = OnSetUsername;
         $.connection.hub.start(function () {
             //hub.server.login(options.MyName);
             //hub.server.joinRoom(options.roomId);
             //hub.server.updateRooms();
-            SetNameDialog();
+            //SetNameDialog();
         });
 
     } else {
@@ -62,7 +63,7 @@ function CreateRoom(data) {
 
 
 /* Dialogs */
-function SetNameDialog() {
+function OnSetUsername() {
     $("#login_modal").modal();
     $("#login").focus();
 }
@@ -77,20 +78,20 @@ function JoinRoomDialog() {
 
 /* Login dialod navigation */
 function SignIn() {
-    $("#signInForm").show();
-    $("#signUpForm").hide();
-    $("#logIn").hide();
+    $("#signin_modal").show();
+    $("#signup_modal").hide();
+    $("#login_modal").hide();
 }
 function SignUp() {
-    $("#signInForm").hide();
-    $("#signUpForm").show();
-    $("#logIn").hide();
+    $("#signin_modal").hide();
+    $("#signup_modal").show();
+    $("#llogin_modalogIn").hide();
 }
 
 function LogIn() {
-    $("#signInForm").hide();
-    $("#signUpForm").hide();
-    $("#logIn").show();
+    $("#signin_modal").hide();
+    $("#signup_modal").hide();
+    $("#login_modal").show();
    // alert("SAS");
 }
 /* Login dialod navigation end*/

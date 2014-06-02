@@ -47,7 +47,8 @@ namespace SpeakingMania.Models
             }
             else
             {
-                username = "anonymous";
+                username = "anonymous2";
+                Clients.Caller.SetUsername();
             }
             using (var db = new SpeakingManiaContext())
             {
@@ -55,15 +56,17 @@ namespace SpeakingMania.Models
                 var user = db.UserProfile
                     //.Include(u => u.Connection)
                     .SingleOrDefault(u => u.UserName == username);
-
-                user.Connection.Add(new Connection
+                if (user != null)
                 {
-                    ConnectionId = Context.ConnectionId,
-                    Connected = true,
-                    Room = defaultRoom,
-                    RoomId = defaultRoom.Id
-                });
-                db.SaveChanges();
+                    user.Connection.Add(new Connection
+                        {
+                            ConnectionId = Context.ConnectionId,
+                            Connected = true,
+                            Room = defaultRoom,
+                            RoomId = defaultRoom.Id
+                        });
+                    db.SaveChanges();
+                }
                 UpdateUsers("MAIN");
             }
             return base.OnConnected();
@@ -87,10 +90,14 @@ namespace SpeakingMania.Models
             using (var db = new SpeakingManiaContext())
             {
                 var connection = db.Connection.FirstOrDefault(s=>s.ConnectionId == Context.ConnectionId);
-                connection.Connected = false;
-                db.SaveChanges();
+                if (connection != null)
+                {
+                    connection.Connected = false;
+                    db.SaveChanges();
+                    UpdateUsers("MAIN");
+                }
             }
-            UpdateUsers("MAIN");
+           
             return base.OnDisconnected();
         }
         
@@ -127,7 +134,7 @@ namespace SpeakingMania.Models
                     simpleUsers.Add(user);
                 }
             }
-            Clients.All.OnUpdateUsers(simpleUsers);
+            Clients.All.UpdateUsers(simpleUsers);
             
         }
         public void UpdateRooms()
@@ -141,10 +148,11 @@ namespace SpeakingMania.Models
                 room.RoomName = r.RoomName;
                 simpleRooms.Add(room);
             }
-            Clients.All.OnUpdateRooms(simpleRooms);
+            Clients.All.UpdateRooms(simpleRooms);
             
         }
     }
+
         
     struct SimpleUser
     {

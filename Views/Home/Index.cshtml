@@ -12,153 +12,37 @@
     </script>
 
 }
-<div class="row well">
+<div class="row">
     <h4>@ViewBag.Message</h4>
     <span>Logined as: </span>
     <h4 id="userName"></h4>
 </div>
           
-<div class="row well mainBlock">
-    <div class="span2 well-small usersBlock">
+<div class="row">
+    <div class="col-lg-2 usersBlock">
         <p class="text-info">Users online:</p> 
-        <ul id="users" class="unstyled">
+        <ul id="users">
         </ul>
+
     </div>
     
-    <div class="span9" id="roomsBlock">
+    <div class="col-lg-6" id="roomsBlock">
         <div class="well roomsBlock">
             <table id="rooms" class="table">
 
             </table>
         </div>
-        <button class="btn btn-success" type="submit" onclick="CreateRoomDialog()">Create a new room</button>
+         
     </div>
-@*    <div class="span9 privateBlock well" id="privateBlock">
+    
+    @*    <div class="span9 privateBlock well" id="privateBlock">
         
         Communicate
         <button class="btn btn-danger" type="submit" onclick="LeaveRoom()">Leave room</button>
     </div>*@
 </div>
-
-<div class="modal fade" id="login_modal">
-    <div class="modal-header">
-        <h3>Log in</h3>
-    </div>
-    <div id="modal_content" class="modal-body">
-        <div id="logIn">
-            <div class="alert alert-info">
-                <p>To get a full pleasure from conversation you should be a registred user. Please register and enjoy :).</p>
-            </div>
-            <div class="form-horizontal">
-                <div class="control-group">
-                    <div class="controls">
-                    <button class="btn btn-success btn-large" type="submit" onclick="SignIn()">Sign in</button>
-                    <b> or </b>
-                    <button class="btn btn-info btn-large" type="submit" onclick="SignUp()">Sign up</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="signInForm" style="display: none">
-            @using (Ajax.BeginForm("Login", null, new AjaxOptions {HttpMethod = "POST", OnSuccess = "Login"}, new {Class = "form-horizontal"}))
-            {
-                <div class="control-group">
-                    <label class="control-label" for="inputLogin">Login</label>
-                    <div class="controls">
-                        <input type="text" id="inputLogin" placeholder="Login" name="inputLogin">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="inputPassword">Password</label>
-                    <div class="controls">
-                        <input type="password" id="inputPassword" placeholder="Password" name="inputPassword">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <div class="controls">
-                        <label class="checkbox">
-                            <input type="checkbox">
-                            Remember me
-                        </label>
-                        <button type="submit" class="btn btn-success">Submit</button>
-                        <button class="btn btn-inverse" type="button" onclick="LogIn()">Go Back</button>
-                    </div>
-                </div>
-                
-            }
-        </div>
-        <div id="signUpForm" style="display: none">
-          @using (Ajax.BeginForm("Register", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "Register" }, new { Class = "form-horizontal" }))
-          {
-              <div class="control-group">
-                  <label class="control-label" for="inputEmail">Email</label>
-                  <div class="controls">
-                      <input type="text" name="inputEmail" placeholder="Email">
-                  </div>
-              </div>
-              <div class="control-group">
-                    <label class="control-label" for="inputLoginRegister">Login</label>
-                    <div class="controls">
-                        <input type="text" name="inputLoginRegister" placeholder="Login">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="inputPasswordRegister">Password</label>
-                    <div class="controls">
-                        <input type="password" name="inputPasswordRegister" placeholder="Password">
-                    </div>
-                </div>
-              <div class="control-group">
-                  <div class="controls">
-                      <button class="btn btn-success" type="submit">Submit</button>
-                      <button class="btn btn-inverse" type="button" onclick="LogIn()">Go Back</button>
-                  </div>
-              </div>
-              <input type="hidden"  name="userId" value="@ViewBag.UserId"/>
-          }  
-        </div>
-        </div>
-    <div class="modal-footer">
-    </div>
-</div>
-@* Room creating modal dialog *@
-<div class="modal fade" id="new_room_modal">
-    <div class="modal-header">
-        <h3>Please fill the form</h3>
-    </div>
-    <div id="modal_content" class="modal-body">
-        @using (Ajax.BeginForm("JoinRoom", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "CreateRoom" }, new { Class = "form-search" }))
-        {
-            <div class="control-group" id="roomForm">
-                <input id="roomName" name="roomName" class="input-xlarge" type="text" placeholder="The name of the room" />
-                <button class="btn btn-primary" type="submit">Open room</button>
-                <span id="room-error" class="help-inline text-error" style="display: none;"></span>
-                <input type="hidden" id="userId" name="userId" value="@ViewBag.UserId"/>
-            </div>
-        }
-    </div>
-    <div class="modal-footer">
-    </div>
-</div>
-@* Room joining modal dialog *@
-<div class="modal fade" id="join_room_modal">
-    <div class="modal-header">
-        <h3>Join the room!</h3>
-    </div>
-    <div id="modal_content" class="modal-body">
-        @using (Ajax.BeginForm("JoinRoom", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "CreateRoom" }, new { Class = "form-search" }))
-        {
-            <div class="control-group" id="joinRoomForm">
-                <h4>Room name: </h4>
-                <label id="lbl_roomName"></label><br/>
-                <input type="hidden" id="roomKey" name="roomKey" />
-                <button class="btn btn-primary" type="submit">Join the room</button>
-                <span id="join-room-error" class="help-inline text-error" style="display: none;"></span>
-                <input type="hidden" id="joinUserId" name="userId" value="@ViewBag.UserId"/>
-            </div>
-        }
-    </div>
-    <div class="modal-footer">
-    </div>
+<div class="row">
+         <button class="btn btn-success" type="submit" onclick="CreateRoomDialog()">Create a new room</button>
 </div>
 
+@Html.Partial("Modal")

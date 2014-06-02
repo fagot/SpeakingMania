@@ -1,10 +1,10 @@
 ﻿.mainBlock 
 {
-    min-height: 500px;
+    min-height: 300px;
 }
 .usersBlock 
 {
-    height: 470px;
+    height: 450px;
     overflow: auto;
     background-color: #E0ECF8;
     margin-left: 0;

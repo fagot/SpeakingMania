@@ -112,40 +112,13 @@ namespace SpeakingMania.Controllers
         [HttpPost]
         public ActionResult Login(string inputLogin, string inputPassword)
         {
-            var errors = new Dictionary<string, string>();
-            var userRepository = new UserRepository();
-            var user = userRepository.GetAuthorizedUser(inputLogin, inputPassword);
-            if (user!=null)
-            {
-                var keyCook = Request.Cookies["SSID"];
-                if (keyCook == null)
-                {
-                    keyCook = new HttpCookie("SSID", Session.SessionID) {Expires = DateTime.Now.AddMinutes(30)};
-                    HttpContext.Response.Cookies.Add(keyCook);
-                }
-
-                var loginCook = new HttpCookie("username", HttpUtility.UrlEncode(inputLogin)) { Expires = DateTime.Now.AddMinutes(30) };
-                HttpContext.Response.Cookies.Add(loginCook);
-                return Json(new { success = true, name = inputLogin, key = keyCook.Value });
-                //return Index();
-            }
-            else
-            {
-                errors.Add("Error", "Incorrect login/password");
-            }
-            return Json(new { success = false, errors });
-            //return View("Index");
+            Models.User.LogIn(Request, Response, Session, inputLogin, inputPassword);
+            return View("Index");
         }
         [HttpPost]
         public ActionResult Register(string inputEmail, string inputLoginRegister, string inputPasswordRegister, string userId)
         {
-            var unit = UoFFactory.UnitOfWork;
-            var newUser = new UserProfile { Password = inputPasswordRegister, UserIdentity = Guid.NewGuid().ToString("N"), UserName = inputLoginRegister, Connection = new List<Connection>()};
-            unit.UserProfileRepository.Insert(newUser);
-            unit.Save();
-            
-            Response.Cookies.Add(new HttpCookie("login", newUser.UserName));
-            Response.Cookies.Add(new HttpCookie("identity", newUser.UserIdentity));
+            Models.User.Register(Request, Response, inputEmail, inputLoginRegister, inputPasswordRegister);
             return RedirectToAction("Index");
         }
     }
