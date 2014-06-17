@@ -50,7 +50,7 @@ namespace SpeakingMania.Models
                 username = "anonymous2";
                 Clients.Caller.SetUsername();
             }
-            using (var db = new SpeakingManiaContext())
+            using (var db = new SpeakingManiaEntities())
             {
                 var defaultRoom = db.Room.SingleOrDefault(s => s.RoomName == "MAIN");
                 var user = db.UserProfile
@@ -87,7 +87,7 @@ namespace SpeakingMania.Models
         }
         public override Task OnDisconnected()
         {
-            using (var db = new SpeakingManiaContext())
+            using (var db = new SpeakingManiaEntities())
             {
                 var connection = db.Connection.FirstOrDefault(s=>s.ConnectionId == Context.ConnectionId);
                 if (connection != null)
@@ -119,7 +119,7 @@ namespace SpeakingMania.Models
         public void UpdateUsers(string roomKey)
         {
             var simpleUsers = new List<SimpleUser>();
-            using (var db = new SpeakingManiaContext())
+            using (var db = new SpeakingManiaEntities())
             {
                 var room =
                     db.Room.FirstOrDefault(s => s.RoomIdentity == roomKey);

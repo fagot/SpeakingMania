@@ -16,7 +16,7 @@ namespace SpeakingMania.Models
             {
                 if (_roomStore == null)
                 {
-                    using (var ctx = new SpeakingManiaContext())
+                    using (var ctx = new SpeakingManiaEntities())
                     {
                         _roomStore = ctx.Room.ToList();
                         return _roomStore;

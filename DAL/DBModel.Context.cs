@@ -12,10 +12,11 @@ namespace SpeakingMania.DAL
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Linq;
     
-    public partial class SpeakingManiaContext : DbContext
+    public partial class SpeakingManiaEntities : DbContext
     {
-        public SpeakingManiaContext()
+        public SpeakingManiaEntities()
             : base("name=SpeakingManiaEntities")
         {
         }
@@ -28,5 +29,7 @@ namespace SpeakingMania.DAL
         public DbSet<Connection> Connection { get; set; }
         public DbSet<Room> Room { get; set; }
         public DbSet<UserProfile> UserProfile { get; set; }
+    
+  
     }
 }

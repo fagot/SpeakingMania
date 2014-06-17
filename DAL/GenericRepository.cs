@@ -11,14 +11,14 @@ namespace SpeakingMania.DAL
 {
     public class GenericRepository<TEntity> where TEntity : class
     {
-        internal SpeakingManiaContext context;
+        internal SpeakingManiaEntities context;
         internal DbSet<TEntity> dbSet;
 
         public GenericRepository()
         {
 
         }
-        public GenericRepository(SpeakingManiaContext context)
+        public GenericRepository(SpeakingManiaEntities context)
         {
             this.context = context;
             this.dbSet = context.Set<TEntity>();

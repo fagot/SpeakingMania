@@ -4,7 +4,7 @@ function Login(data) {
     var hub = {};
     var options = {};
     if (data.success) {
-        $("#login_modal").modal('hide');
+        HideModals();
         $("#userName").html(data.name);
         options.roomId = "MAIN";
         // Прокси-объект чата
@@ -35,8 +35,12 @@ function Login(data) {
 
 function Register() {
     alert("registred");
+    //location.reload();
 }
-
+function LoggedIn() {
+    alert("logged");
+    Login({ success: true });
+}
 function CreateRoom(data) {
     var hub = {};
     var options = {};
@@ -78,22 +82,29 @@ function JoinRoomDialog() {
 
 /* Login dialod navigation */
 function SignIn() {
-    $("#signin_modal").show();
-    $("#signup_modal").hide();
-    $("#login_modal").hide();
+    $("#signin_modal").modal('show')
+    $("#signup_modal").modal('hide')
+    $("#login_modal").modal('hide')
 }
 function SignUp() {
-    $("#signin_modal").hide();
-    $("#signup_modal").show();
-    $("#llogin_modalogIn").hide();
+    $("#signin_modal").modal('hide');
+    $("#signup_modal").modal('show');
+    $("#login_modal").modal('hide');
 }
 
 function LogIn() {
-    $("#signin_modal").hide();
-    $("#signup_modal").hide();
-    $("#login_modal").show();
+    $("#signin_modal").modal('hide');
+    $("#signup_modal").modal('hide');
+    $("#login_modal").modal('show');
    // alert("SAS");
 }
+
+function HideModals() {
+    $("#signin_modal").modal('hide');
+    $("#signup_modal").modal('hide');
+    $("#login_modal").modal('hide');
+}
+
 /* Login dialod navigation end*/
 
 function OnJoinRoom(userId, roomId) {

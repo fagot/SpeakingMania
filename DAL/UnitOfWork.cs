@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 
@@ -9,10 +10,10 @@ namespace SpeakingMania.DAL
     {
         public UnitOfWork()
         {
-            context = new SpeakingManiaContext();
+            context = new SpeakingManiaEntities();
         }
 
-        private SpeakingManiaContext context;
+        private SpeakingManiaEntities context;
         private GenericRepository<Connection> _connectionRepository;
         private GenericRepository<Room> _roomRepository;
         private GenericRepository<UserProfile> _userProfileRepository;
